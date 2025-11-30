@@ -48,10 +48,10 @@ void UIPage::show() {
     if (globalUI) {
         Serial.println("  Calling redrawHeader()...");
         // Header und Footer komplett neu zeichnen (um Überlagerungen zu vermeiden)
-        globalUI->drawHeader();
+        globalUI->redrawHeader();
         
         Serial.println("  Calling redrawFooter()...");
-        globalUI->drawFooter();
+        globalUI->redrawFooter();
                 
         Serial.println("  Calling clearContentArea()...");
         globalUI->clearContentArea();
