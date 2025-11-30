@@ -18,8 +18,8 @@ TouchManager::TouchManager()
     , calibrated(false)
     , pressureThreshold(TOUCH_THRESHOLD)
     , rotation(TOUCH_ROTATION)
-    , displayWidth(TFT_WIDTH)
-    , displayHeight(TFT_HEIGHT)
+    , displayWidth(DISPLAY_WIDTH)
+    , displayHeight(DISPLAY_HEIGHT)
     , touchStartTime(0)
 {
     // Aktuellen Touch-Punkt initialisieren
@@ -193,12 +193,12 @@ void TouchManager::setRotation(uint8_t rot) {
     // Display-Größe anpassen basierend auf Rotation
     if (rotation == 0 || rotation == 2) {
         // Portrait
-        displayWidth = TFT_HEIGHT;
-        displayHeight = TFT_WIDTH;
+        displayWidth = DISPLAY_HEIGHT;
+        displayHeight = DISPLAY_WIDTH;
     } else {
         // Landscape
-        displayWidth = TFT_WIDTH;
-        displayHeight = TFT_HEIGHT;
+        displayWidth = DISPLAY_WIDTH;
+        displayHeight = DISPLAY_HEIGHT;
     }
 }
 

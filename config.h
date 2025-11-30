@@ -50,8 +50,8 @@
 // ⚡ DISPLAY EINSTELLUNGEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-#define TFT_WIDTH   480   // Display Breite in Pixeln
-#define TFT_HEIGHT  320   // Display Höhe in Pixeln
+#define DISPLAY_WIDTH   480   // Display Breite in Pixeln
+#define DISPLAY_HEIGHT  320   // Display Höhe in Pixeln
 #define DISPLAY_ROTATION    3      // Display-Rotation (0-3)
 
 // SPI-Geschwindigkeiten
@@ -144,7 +144,7 @@
 
 // Content Area
 #define UI_CONTENT_Y            UI_STATUSBAR_HEIGHT
-#define UI_CONTENT_HEIGHT       (TFT_HEIGHT - UI_STATUSBAR_HEIGHT - UI_NAVBAR_HEIGHT)
+#define UI_CONTENT_HEIGHT       (DISPLAY_HEIGHT - UI_STATUSBAR_HEIGHT - UI_NAVBAR_HEIGHT)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 🔧 DEBUG EINSTELLUNGEN
