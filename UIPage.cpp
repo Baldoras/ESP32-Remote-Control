@@ -53,6 +53,9 @@ void UIPage::show() {
         Serial.println("  Calling redrawFooter()...");
         globalUI->drawFooter();
                 
+        Serial.println("  Calling clearContentArea()...");
+        globalUI->clearContentArea();
+        
         Serial.println("  Calling setPageTitle()...");
         // Seiten-Titel setzen
         globalUI->setHeaderText(pageName);
