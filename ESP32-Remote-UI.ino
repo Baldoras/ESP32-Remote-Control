@@ -75,7 +75,7 @@ public:
             layout.contentY + 75, 
             layout.contentWidth - 40, 
             30, 
-            "Wähle eine Seite:"
+            "Choose a page:"
         );
         lblInfo->setFontSize(2);
         lblInfo->setAlignment(TextAlignment::CENTER);
