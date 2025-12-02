@@ -52,20 +52,21 @@ void UIPage::show() {
         
         Serial.println("  Calling redrawFooter()...");
         globalUI->redrawFooter();
-                
+        
         Serial.println("  Calling clearContentArea()...");
+        // Content-Bereich löschen
         globalUI->clearContentArea();
         
         Serial.println("  Calling setPageTitle()...");
         // Seiten-Titel setzen
-        globalUI->setHeaderText(pageName);
+        globalUI->setPageTitle(pageName);
         
         Serial.println("  Calling showBackButton()...");
         // Zurück-Button konfigurieren
         if (hasBackButton) {
-            globalUI->showBackButton(true, pageManager, backButtonTarget);
+            globalUI->showBackButton(true, backButtonTarget);
         } else {
-            globalUI->showBackButton(false);  // Nutzt Default-Parameter
+            globalUI->showBackButton(false);
         }
         
         Serial.println("  Calling updateBatteryIcon()...");
@@ -132,6 +133,6 @@ void UIPage::initDefaultLayout() {
     layout.contentX = 0;
     layout.contentY = 40;           // Nach Header
     layout.contentWidth = 480;      // Volle Breite
-    layout.contentHeight = 240;     // 280 - 40 = 240px
+    layout.contentHeight = 260;     // 280 - 20 = 240px
     layout.contentBgColor = COLOR_BLACK;
 }

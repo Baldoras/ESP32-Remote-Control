@@ -47,7 +47,7 @@ void UIManager::update() {
     if (touchActive && point.valid) {
         // Touch aktiv - an alle Elemente weiterleiten
         for (auto* element : elements) {
-            if (element->isVisible() && element->isEnabled()) {
+            if (element && element->isVisible() && element->isEnabled()) {
                 handleElementTouch(element, point.x, point.y, true);
             }
         }
@@ -57,7 +57,7 @@ void UIManager::update() {
     } else if (lastTouchState) {
         // Touch gerade beendet - Release-Event
         for (auto* element : elements) {
-            if (element->isVisible() && element->isEnabled()) {
+            if (element && element->isEnabled() && element->isVisible()) {
                 handleElementTouch(element, lastTouchX, lastTouchY, false);
             }
         }
@@ -70,7 +70,7 @@ void UIManager::drawAll() {
     if (!tft) return;
     
     for (auto* element : elements) {
-        if (element->isVisible()) {
+        if (element && element->isVisible()) {
             element->draw(tft);
         }
     }
@@ -80,7 +80,7 @@ void UIManager::drawUpdates() {
     if (!tft) return;
     
     for (auto* element : elements) {
-        if (element->isVisible() && element->getNeedsRedraw()) {
+        if (element && element->isVisible() && element->getNeedsRedraw()) {
             element->draw(tft);
         }
     }
@@ -93,7 +93,9 @@ void UIManager::clearScreen(uint16_t color) {
     
     // Alle Elemente als "needs redraw" markieren
     for (auto* element : elements) {
-        element->setNeedsRedraw(true);
+        if (element) {
+            element->setNeedsRedraw(true);
+        }
     }
 }
 
@@ -113,6 +115,11 @@ void UIManager::printDebugInfo() {
     
     for (int i = 0; i < elements.size(); i++) {
         auto* el = elements[i];
+        if (!el) {
+            Serial.printf("  [%d] NULL\n", i);
+            continue;
+        }
+        
         int16_t x, y, w, h;
         el->getBounds(&x, &y, &w, &h);
         

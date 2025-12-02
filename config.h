@@ -50,8 +50,8 @@
 // ⚡ DISPLAY EINSTELLUNGEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-#define DISPLAY_WIDTH   480   // Display Breite in Pixeln
-#define DISPLAY_HEIGHT  320   // Display Höhe in Pixeln
+#define DISPLAY_WIDTH     480   // Display Breite in Pixeln
+#define DISPLAY_HEIGHT    320   // Display Höhe in Pixeln
 #define DISPLAY_ROTATION    3      // Display-Rotation (0-3)
 
 // SPI-Geschwindigkeiten

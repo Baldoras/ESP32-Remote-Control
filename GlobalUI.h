@@ -1,10 +1,16 @@
 /**
  * GlobalUI.h
  * 
- * Zentrale UI-Verwaltung - Header/Footer/Battery
+ * Globaler UI-Manager für Header, Footer und Battery-Icon
  * 
- * WICHTIG: Nur EINE Instanz pro Projekt!
- * Verhindert Memory-Corruption durch Duplikate
+ * Verwaltet UI-Elemente die auf ALLEN Seiten gleich sind:
+ * - Header (0-40px): Zurück-Button + Seiten-Titel + Battery-Icon
+ * - Footer (280-320px): Status-Text
+ * 
+ * Vorteile:
+ * - Battery-Icon nur 1x erstellt (kein Memory-Problem)
+ * - Header/Footer einmalig gezeichnet
+ * - Konsistentes Layout über alle Pages
  */
 
 #ifndef GLOBAL_UI_H
@@ -12,18 +18,15 @@
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
-#include "config.h"
 #include "UIManager.h"
 #include "UILabel.h"
 #include "UIButton.h"
 #include "BatteryMonitor.h"
+#include "config.h"
 
-// Forward Declaration
+// Forward declaration
 class UIPageManager;
 
-/**
- * GlobalUI - Zentrale Verwaltung für Header/Footer/Battery
- */
 class GlobalUI {
 public:
     /**
@@ -37,13 +40,21 @@ public:
     ~GlobalUI();
 
     /**
-     * GlobalUI initialisieren
+     * Global UI initialisieren (einmalig in setup() aufrufen)
+     * Zeichnet Header/Footer Hintergrund und erstellt globale Widgets
+     * 
      * @param ui UIManager Pointer
-     * @param tft TFT_eSPI Pointer
+     * @param tft TFT Display Pointer
      * @param battery BatteryMonitor Pointer
      * @return true bei Erfolg
      */
     bool init(UIManager* ui, TFT_eSPI* tft, BatteryMonitor* battery);
+
+    /**
+     * PageManager setzen (einmalig beim Setup)
+     * @param pm UIPageManager Pointer
+     */
+    void setPageManager(UIPageManager* pm);
 
     /**
      * Seiten-Titel setzen (wird bei Page-Wechsel aufgerufen)
@@ -54,10 +65,9 @@ public:
     /**
      * Zurück-Button anzeigen/verstecken
      * @param show true = anzeigen, false = verstecken
-     * @param pageManager PageManager Pointer (für Navigation)
-     * @param targetPageId Ziel-Seite beim Klick
+     * @param targetPageId Ziel-Seite beim Klick (-1 = kein Ziel)
      */
-    void showBackButton(bool show, UIPageManager* pageManager = nullptr, int targetPageId = -1);
+    void showBackButton(bool show, int targetPageId = -1);
 
     /**
      * Battery-Icon aktualisieren (alle 2 Sekunden in loop() aufrufen)
@@ -81,68 +91,47 @@ public:
     void redrawFooter();
 
     /**
-     * Content-Bereich löschen (zwischen Header/Footer)
+     * Content-Bereich löschen (bei Page-Wechsel)
      */
     void clearContentArea();
 
     /**
-     * UIManager abrufen
+     * Layout-Konstanten für Pages
+     * (DISPLAY_WIDTH/HEIGHT aus config.h verwenden!)
      */
-    UIManager* getUIManager() { return ui; }
-
-    /**
-     * TFT abrufen
-     */
-    TFT_eSPI* getTFT() { return tft; }
-
-    /**
-     * Battery-Prozent abrufen
-     */
-    uint8_t getBatteryPercent();
-
-    /**
-     * Battery-Spannung abrufen
-     */
-    float getBatteryVoltage();
-
-    /**
-     * Header-Label abrufen (für direkten Zugriff)
-     */
-    UILabel* getHeaderLabel() { return headerLabel; }
-
-    /**
-     * Footer-Label abrufen (für direkten Zugriff)
-     */
-    UILabel* getFooterLabel() { return footerLabel; }
+    static const int16_t HEADER_HEIGHT = 40;
+    static const int16_t FOOTER_HEIGHT = 20;
+    static const int16_t CONTENT_Y = 40;
+    static const int16_t CONTENT_HEIGHT = 260;  // DISPLAY_HEIGHT - HEADER - FOOTER
 
 private:
-    UIManager* ui;              // UI-Manager
-    TFT_eSPI* tft;              // Display
-    BatteryMonitor* battery;    // Battery-Monitor
+    UIManager* ui;                  // UI-Manager
+    TFT_eSPI* tft;                  // Display
+    BatteryMonitor* battery;        // Battery Monitor
+    UIPageManager* pageManager;     // Page Manager (für Back-Button Navigation)
     
-    // UI-Elemente (nur hier erstellt!)
-    UILabel* headerLabel;       // Header Label
-    UILabel* footerLabel;       // Footer Label
-    UILabel* batteryLabel;      // Battery-Prozent Text
-    UIButton* backButton;       // Zurück-Button (optional)
+    // Global UI Elemente
+    UILabel* lblHeaderTitle;        // Seiten-Titel (zentriert)
+    UILabel* lblBatteryIcon;        // Battery-Icon (rechts oben)
+    UIButton* btnBack;              // Zurück-Button (links oben)
+    UILabel* lblFooter;             // Footer-Text (zentriert)
     
-    bool initialized;           // Init-Flag
-    unsigned long lastBatteryUpdate;  // Letzte Battery-Aktualisierung
-    
-    /**
-     * Header-Elemente erstellen
-     */
-    void createHeaderElements();
+    bool initialized;               // Initialisierungs-Flag
     
     /**
-     * Footer-Elemente erstellen
+     * Header Hintergrund zeichnen
      */
-    void createFooterElements();
+    void drawHeaderBackground();
     
     /**
-     * Battery-Icon zeichnen
+     * Footer Hintergrund zeichnen
      */
-    void drawBatteryIcon(int16_t x, int16_t y, uint8_t percent, bool charging = false);
+    void drawFooterBackground();
+    
+    /**
+     * Battery-Icon Farbe basierend auf Ladezustand
+     */
+    void updateBatteryIconColor(uint8_t percent);
 };
 
 #endif // GLOBAL_UI_H
