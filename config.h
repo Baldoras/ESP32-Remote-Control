@@ -70,6 +70,7 @@
 #define VOLTAGE_BATTERY_NOM   7.4   // 2S LiPo nominal (3.7V/Zelle)
 #define VOLTAGE_ALARM_LOW     7.0   // Warnung bei <7.0V (3.5V/Zelle)
 #define VOLTAGE_SHUTDOWN      6.6   // AUTO-SHUTDOWN bei 6.6V! ⚠️
+#define VOLTAGE_CALIBRATION_FACTOR  0.7 // Calibration factor, da das messmodul von 12V ausgeht
 #define VOLTAGE_CHECK_INTERVAL 1000 // Spannungs-Check alle 1000ms
 
 // ═══════════════════════════════════════════════════════════════════════════
