@@ -90,8 +90,8 @@ bool JoystickHandler::update() {
     valueY = newValueY;
     
     if (changed) {
-      DEBUG_PRINTF("Value X: %d\n", valueX);
-      DEBUG_PRINTF("Value Y: %d\n", valueY);
+        DEBUG_PRINTF("Value X: %d | Raw X: %d\n", valueX, rawX);
+        DEBUG_PRINTF("Value Y: %d | Raw Y: %d\n", valueY, rawY);
     }
     return changed;
 }
@@ -183,8 +183,16 @@ void JoystickHandler::printInfo() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 int16_t JoystickHandler::readRaw(uint8_t pin) {
-    // ADC auslesen (12-Bit: 0-4095)
-    return analogRead(pin);
+    // Mehrfache Messung für Stabilität (gegen ADC-Rauschen)
+    const int samples = 5;
+    int32_t sum = 0;
+    
+    for (int i = 0; i < samples; i++) {
+        sum += analogRead(pin);
+        delayMicroseconds(100);  // Kurze Pause zwischen Messungen
+    }
+    
+    return sum / samples;
 }
 
 int16_t JoystickHandler::mapValue(int16_t raw, const AxisCalibration& cal, bool invert) {
