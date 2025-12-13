@@ -16,7 +16,7 @@
 
 #include <Arduino.h>
 #include <esp_sleep.h>
-#include "config.h"
+#include "setupConf.h"
 #include "BatteryMonitor.h"
 #include "DisplayHandler.h"
 
