@@ -1,3 +1,4 @@
+#include "esp32-hal.h"
 /**
  * TouchManager.cpp
  * 
@@ -176,12 +177,33 @@ TouchPoint TouchManager::getTouchPoint() {
 
 bool TouchManager::getRawTouch(int16_t* x, int16_t* y, uint16_t* z) {
     if (!isAvailable()) return false;
-    
+
+    const uint8_t SAMPLE_COUNT = 10;
+    const uint16_t SAMPLE_DELAY_US = 100;
+
     if (ts->touched()) {
         TS_Point p = ts->getPoint();
         
-        if (x != nullptr) *x = p.x;
-        if (y != nullptr) *y = p.y;
+        int16_t bufferX[SAMPLE_COUNT] = {p.x};
+        int16_t bufferY[SAMPLE_COUNT] = {p.y};
+
+        for (uint8_t i = 0; i < SAMPLE_COUNT; i++) {
+            TS_Point p = ts->getPoint();
+            bufferX[i] = p.x;
+            bufferY[i] = p.y;
+            delayMicroseconds(SAMPLE_DELAY_US);
+        }
+        
+        long sumX = 0;
+        long sumY = 0;
+
+        for (uint8_t i = 0; i < SAMPLE_COUNT; i++) {
+            sumX += bufferX[i];
+            sumY += bufferY[i];
+        }
+        
+        if (x != nullptr) *x = sumX / SAMPLE_COUNT;
+        if (y != nullptr) *y = sumY / SAMPLE_COUNT;
         if (z != nullptr) *z = p.z;
         
         return true;
