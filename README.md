@@ -4,6 +4,12 @@
 
 ---
 
+## Kompatibilitätshinweis
+
+**Dieses Projekt ist für die Arduino-IDE ausgelegt und verwendet ESP32 core 3.3.0**
+
+---
+
 ## 📋 Projekt-Übersicht
 
 Dieses Projekt ist eine vollständig ausgestattete, batteriegetriebene Fernsteuerung für ein **Kettenfahrzeug**. Die Hardware basiert auf einem **ESP32-S3-N16R8** mit einem **4" TFT-Touchdisplay (ST7796)**, analogem Joystick und umfassendem Logging auf SD-Karte. Die Kommunikation mit dem Fahrzeug erfolgt über **ESP-NOW** (2.4 GHz).
