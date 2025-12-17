@@ -89,10 +89,6 @@ bool JoystickHandler::update() {
     valueX = newValueX;
     valueY = newValueY;
     
-    if (changed) {
-        DEBUG_PRINTF("Value X: %d | Raw X: %d\n", valueX, rawX);
-        DEBUG_PRINTF("Value Y: %d | Raw Y: %d\n", valueY, rawY);
-    }
     return changed;
 }
 
