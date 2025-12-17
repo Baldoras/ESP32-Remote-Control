@@ -205,8 +205,6 @@ void UserConfig::loadDefaults() {
     config.espnowChannel = ESPNOW_CHANNEL;
     config.espnowMaxPeers = ESPNOW_MAX_PEERS;
     config.espnowPeerMac[sizeof(config.espnowPeerMac) - 1] = '\0';
-    //config.espnowChannel = doc["espnow"]["channel"] | config.espnowChannel;
-    //config.espnowMaxPeers = doc["espnow"]["maxPeers"] | config.espnowMaxPeers;
     
     // Joystick
     config.joyDeadzone = JOY_DEADZONE;
@@ -222,6 +220,9 @@ void UserConfig::loadDefaults() {
     config.joyCalYCenter = JOY_CAL_Y_CENTER;
     config.joyCalYMax = JOY_CAL_Y_MAX;
     
+    // Auto Shutdown
+    config.autoShutDownEnabled = AUTO_SHUTDOWN;
+
     // Debug
     config.debugSerialEnabled = DEBUG_SERIAL;
 }
@@ -348,6 +349,9 @@ void UserConfig::printInfo() const {
     DEBUG_PRINTF("  X-Axis: %d | %d | %d\n", config.joyCalXMin, config.joyCalXCenter, config.joyCalXMax);
     DEBUG_PRINTF("  Y-Axis: %d | %d | %d\n", config.joyCalYMin, config.joyCalYCenter, config.joyCalYMax);
     
+    DEBUG_PRINTLN("\n🔧 Auto-Shutdown:");
+    DEBUG_PRINTF("  Auto-Shutdown: %s\n", config.autoShutDownEnabled ? "Enabled" : "Disabled");
+
     DEBUG_PRINTLN("\n🔧 DEBUG:");
     DEBUG_PRINTF("  Serial Debug: %s\n", config.debugSerialEnabled ? "Enabled" : "Disabled");
     
@@ -410,6 +414,9 @@ bool UserConfig::deserializeFromJson(const String& jsonString) {
     config.joyCalYCenter = doc["joystick"]["cal"]["yCenter"] | config.joyCalYCenter;
     config.joyCalYMax = doc["joystick"]["cal"]["yMax"] | config.joyCalYMax;
     
+    // Auto-Shutdown
+    config.autoShutDownEnabled = doc["autoshutdown"]["autoShutdownEnabled"] | config.autoShutDownEnabled;
+
     // Debug
     config.debugSerialEnabled = doc["debug"]["serialEnabled"] | config.debugSerialEnabled;
     
@@ -455,6 +462,9 @@ bool UserConfig::serializeToJson(String& jsonString) {
     doc["joystick"]["cal"]["yCenter"] = config.joyCalYCenter;
     doc["joystick"]["cal"]["yMax"] = config.joyCalYMax;
     
+    // Autoshutdown
+    doc["autoshutdown"]["autoShutdownEnabled"] = config.autoShutDownEnabled;
+
     // Debug
     doc["debug"]["serialEnabled"] = config.debugSerialEnabled;
     
@@ -579,6 +589,13 @@ void UserConfig::setJoyCalibration(uint8_t axis, int16_t min, int16_t center, in
     }
     
     if (changed) setDirty(true);
+}
+
+void UserConfig::setAutoShutdownEnabled(bool value) {
+    if (config.autoShutDownEnabled != value) {
+        config.autoShutDownEnabled = value;
+        setDirty(true);
+    }
 }
 
 void UserConfig::setDebugSerialEnabled(bool value) {

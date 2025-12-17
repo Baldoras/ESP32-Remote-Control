@@ -175,6 +175,7 @@ enum ErrorCode {
 // DEBUG SETTINGS
 // ═══════════════════════════════════════════════════════════════════════════
 #define SERIAL_BAUD_RATE    115200  // Serielle Baudrate
+#define DEBUG_SERIAL        true    // Debug-Ausgaben aktivieren
 
 // Debug-Makros
 #if DEBUG_SERIAL

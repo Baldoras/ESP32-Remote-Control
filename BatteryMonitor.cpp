@@ -5,6 +5,7 @@
  */
 
 #include "BatteryMonitor.h"
+#include "UserConfig.h"
 
 BatteryMonitor::BatteryMonitor()
     : initialized(false)
@@ -34,6 +35,8 @@ BatteryMonitor::~BatteryMonitor() {
 bool BatteryMonitor::begin() {
     DEBUG_PRINTLN("BatteryMonitor: Initialisiere Spannungssensor...");
     
+    setAutoShutdown(userConfig.getAutoShutdown());
+
     // ADC-Pin konfigurieren
     pinMode(VOLTAGE_SENSOR_PIN, INPUT);
     
@@ -61,7 +64,9 @@ bool BatteryMonitor::begin() {
 
 bool BatteryMonitor::update() {
     if (!initialized) return false;
-    
+
+    setAutoShutdown(userConfig.getAutoShutdown());
+
     // Nur alle VOLTAGE_CHECK_INTERVAL ms aktualisieren
     unsigned long now = millis();
     if (now - lastUpdateTime < VOLTAGE_CHECK_INTERVAL) {

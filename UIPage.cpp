@@ -145,12 +145,12 @@ void UIPage::addContentElement(UIElement* element) {
 
 void UIPage::initDefaultLayout() {
     // Layout nur für Content-Bereich
-    // Header (0-40px) und Footer (280-320px) werden von UILayout verwaltet
+    // Header (0-40px) und Footer (300-320px) werden von UILayout verwaltet
     
     layout.contentX = 0;
     layout.contentY = 40;           // Nach Header
     layout.contentWidth = 480;      // Volle Breite
-    layout.contentHeight = 260;     // 280 - 40 (Header) = 240px
+    layout.contentHeight = 260;     // 320 - 40 (Header) - 20 (footer) = 260px
     layout.contentBgColor = COLOR_BLACK;
 }
 

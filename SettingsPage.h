@@ -16,6 +16,8 @@ public:
     SettingsPage(UIManager* ui, TFT_eSPI* tft);
     
     void build() override;
+
+    void changeAutoShutdown();
 };
 
 #endif // SETTINGSPAGE_H

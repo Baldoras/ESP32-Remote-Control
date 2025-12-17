@@ -25,10 +25,10 @@
 // 👆 TOUCH KALIBRIERUNG (Benutzer-anpassbar)
 // ═══════════════════════════════════════════════════════════════════════════
 
-#define TOUCH_MIN_X      100    // Minimum X (nach erstem Start anpassen!)
-#define TOUCH_MAX_X      4000   // Maximum X
-#define TOUCH_MIN_Y      100    // Minimum Y
-#define TOUCH_MAX_Y      4000   // Maximum Y
+#define TOUCH_MIN_X      300    // Minimum X (nach erstem Start anpassen!)
+#define TOUCH_MAX_X      3800   // Maximum X
+#define TOUCH_MIN_Y      300    // Minimum Y
+#define TOUCH_MAX_Y      3800   // Maximum Y
 #define TOUCH_ROTATION   1      // Touch-Rotation (0-3)
 #define TOUCH_THRESHOLD  40     // Mindestdruck für Touch-Erkennung
 
@@ -64,7 +64,12 @@
 // 🔧 DEBUG EINSTELLUNGEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-#define DEBUG_SERIAL        true    // Debug-Ausgaben aktivieren
+#define AUTO_SHUTDOWN        true    // Auto shutdown enabled
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔧 DEBUG EINSTELLUNGEN
+// ═══════════════════════════════════════════════════════════════════════════
+
+#define DEBUG_SERIAL         true    // Debug-Ausgaben aktivieren
 
 
 #endif // USER_CONF_H

@@ -33,6 +33,7 @@ void setup() {
     
     Serial.begin(115200);
     delay(2000);
+    Serial.println("ok");
     
     DEBUG_PRINTLN("\n╔════════════════════════════════════════╗");
     DEBUG_PRINTLN("║   ESP32-S3 Remote Control Startup      ║");

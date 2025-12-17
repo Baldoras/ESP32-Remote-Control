@@ -8,6 +8,7 @@
 #include "UIButton.h"
 #include "UILabel.h"
 #include "UISlider.h"
+#include "UICheckBox.h"
 #include "PageManager.h"
 #include "DisplayHandler.h"
 #include "UserConfig.h"
@@ -22,13 +23,13 @@ SettingsPage::SettingsPage(UIManager* ui, TFT_eSPI* tft)
 void SettingsPage::build() {
     Serial.println("Building SettingsPage...");
     
-    UILabel* lblTitle = new UILabel(layout.contentX + 20, layout.contentY + 20, layout.contentWidth - 40, 30, "Settings");
+    UILabel* lblTitle = new UILabel(layout.contentX + 20, layout.contentY + 20, layout.contentWidth - 40, 30, "Brightness");
     lblTitle->setFontSize(2);
-    lblTitle->setAlignment(TextAlignment::CENTER);
+    lblTitle->setAlignment(TextAlignment::LEFT);
     lblTitle->setTransparent(true);
     addContentElement(lblTitle);
     
-    UISlider* sldBrightness = new UISlider(layout.contentX + 20, layout.contentY + 50, 410, 50);
+    UISlider* sldBrightness = new UISlider(layout.contentX + 20, layout.contentY + 45, 400, 40);
     sldBrightness->setValue(userConfig.getBacklightDefault());
     sldBrightness->setShowValue(true);
     sldBrightness->on(EventType::VALUE_CHANGED, [](EventData* data) {
@@ -36,6 +37,15 @@ void SettingsPage::build() {
         display.setBacklight(brightness);
     });
     addContentElement(sldBrightness);
+
+    UICheckBox* chkAutoShutdown = new UICheckBox(layout.contentX + 20, layout.contentY + 90, 30, "Auto shutdown");
+    chkAutoShutdown->setChecked(userConfig.getAutoShutdown());
+    chkAutoShutdown->on(EventType::CLICK, [this](EventData* data) {
+        //changeAutoShutdown();
+        ::userConfig.setAutoShutdownEnabled(!userConfig.getAutoShutdown());
+        Serial.printf("Settings: Auto-Shutdown: %d\n", userConfig.getAutoShutdown());
+    });
+    addContentElement(chkAutoShutdown);
 
     UILabel* lblInfo = new UILabel(layout.contentX + 20, layout.contentY + 110, layout.contentWidth - 40, 60, "Config via SD-Card config.json");
     lblInfo->setFontSize(1);
@@ -59,4 +69,8 @@ void SettingsPage::build() {
     addContentElement(btnCalibrate);
     
     Serial.println("  ✅ SettingsPage build complete");
+}
+
+void changeAutoShutdown() {
+    userConfig.setAutoShutdownEnabled(!userConfig.getAutoShutdown());
 }

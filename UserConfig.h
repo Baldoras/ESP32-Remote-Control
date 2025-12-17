@@ -60,6 +60,9 @@ struct UserConfigData {
     int16_t joyCalYCenter;
     int16_t joyCalYMax;
     
+    // Auto shutdown
+    bool autoShutDownEnabled;
+
     // Debug
     bool debugSerialEnabled;
 };
@@ -170,6 +173,9 @@ public:
     int16_t getJoyCalYCenter() const { return config.joyCalYCenter; }
     int16_t getJoyCalYMax() const { return config.joyCalYMax; }
     
+    // Auto shutdown
+    bool getAutoShutdown() const {return config.autoShutDownEnabled;}
+
     // Debug
     bool getDebugSerialEnabled() const { return config.debugSerialEnabled; }
 
@@ -200,6 +206,9 @@ public:
     
     // Joystick Kalibrierung
     void setJoyCalibration(uint8_t axis, int16_t min, int16_t center, int16_t max);
+    
+    // Auto-Shutdown
+    void setAutoShutdownEnabled(bool value);
     
     // Debug
     void setDebugSerialEnabled(bool value);
