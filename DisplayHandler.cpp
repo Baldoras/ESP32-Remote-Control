@@ -24,6 +24,7 @@ bool DisplayHandler::begin(UserConfig* config) {
     // KRITISCH: Touch CS auf HIGH (inaktiv!)
     // ═══════════════════════════════════════════════════════════════
     disableTouch();
+    digitalWrite(TOUCH_CS, HIGH);  // Touch inaktiv
     delay(100);
     
     // ═══════════════════════════════════════════════════════════════
