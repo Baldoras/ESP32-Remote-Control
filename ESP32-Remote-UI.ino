@@ -10,15 +10,15 @@
  * - Pages werden vom PageManager erstellt und verwaltet
  */
 
-#include "hardware/TouchManager.h"
-#include "hardware/BatteryMonitor.h"
-#include "hardware/SDCardHandler.h"
-#include "hardware/JoystickHandler.h"
-#include "ui/core/UIManager.h"
-#include "core/PageManager.h"
-#include "hardware/ESPNowManager.h"
-#include "core/UserConfig.h"
-#include "core/Globals.h"
+#include "TouchManager.h"
+#include "BatteryMonitor.h"
+#include "SDCardHandler.h"
+#include "JoystickHandler.h"
+#include "UIManager.h"
+#include "PageManager.h"
+#include "ESPNowManager.h"
+#include "UserConfig.h"
+#include "Globals.h"
 
 // UIManager (für Widget-Verwaltung)
 UIManager* ui = nullptr;
