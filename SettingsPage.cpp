@@ -40,10 +40,8 @@ void SettingsPage::build() {
 
     UICheckBox* chkAutoShutdown = new UICheckBox(layout.contentX + 20, layout.contentY + 90, 30, "Auto shutdown");
     chkAutoShutdown->setChecked(userConfig.getAutoShutdown());
-    chkAutoShutdown->on(EventType::CLICK, [this](EventData* data) {
-        //changeAutoShutdown();
-        ::userConfig.setAutoShutdownEnabled(!userConfig.getAutoShutdown());
-        Serial.printf("Settings: Auto-Shutdown: %d\n", userConfig.getAutoShutdown());
+    chkAutoShutdown->on(EventType::VALUE_CHANGED, [this](EventData* data) {
+        userConfig.setAutoShutdownEnabled(data->value);       
     });
     addContentElement(chkAutoShutdown);
 
@@ -69,8 +67,4 @@ void SettingsPage::build() {
     addContentElement(btnCalibrate);
     
     Serial.println("  ✅ SettingsPage build complete");
-}
-
-void changeAutoShutdown() {
-    userConfig.setAutoShutdownEnabled(!userConfig.getAutoShutdown());
 }

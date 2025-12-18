@@ -120,7 +120,6 @@ void BatteryMonitor::setShutdownCallback(BatteryShutdownCallback callback) {
 
 void BatteryMonitor::setAutoShutdown(bool enabled) {
     autoShutdownEnabled = enabled;
-    DEBUG_PRINTF("BatteryMonitor: Auto-Shutdown %s\n", enabled ? "aktiviert" : "deaktiviert");
 }
 
 void BatteryMonitor::shutdown() {
