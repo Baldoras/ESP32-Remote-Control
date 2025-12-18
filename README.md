@@ -40,6 +40,7 @@ Dieses Projekt ist eine vollständig ausgestattete, batteriegetriebene Fernsteue
 | **Batterie** | 2S LiPo | 7.4V nominal (6.6V - 8.4V) |
 | **Spannungssensor** | 0-25V Modul | Batterie-Monitoring mit ADC |
 | **Backlight** | PN2222A NPN | PWM-gesteuert (0-255) |
+| **Step-Down buck** | 2 x XL4015 | Speißt eine 5V und eine 3,3V Schiene |
 
 ### Pinbelegung
 
@@ -83,17 +84,16 @@ ESP32-Remote-UI.ino          // Hauptprogramm
 ├── JoystickHandler         // 2-Achsen ADC mit Deadzone
 ├── SDCardHandler           // JSON-Logging + Config-Management
 ├── EspNowManager           // ESP-NOW mit TLV-Protokoll
-├── GlobalUI                // Header/Footer/Battery-Icon
-├── UIPageManager           // Multi-Page Navigation
-└── Pages.cpp               // HomePage, RemotePage, ConnectionPage, etc.
+├── UILayout                // Header/Content/Footer/Battery-Icon
+├── PageManager           // Multi-Page Navigation
 ```
 
 ### UI-System
 
-- **GlobalUI**: Zentrales Header/Footer-Management
+- **UILayout**: Zentrales Header/Content/Footer-Management
   - Header (0-40px): Zurück-Button, Titel, Battery-Icon
-  - Footer (280-320px): Status-Text
-- **UIPageManager**: Verwaltet 5 Seiten mit Navigation
+  - Footer (300-320px): Status-Text
+- **PageManager**: Verwaltet 5 Seiten mit Navigation
 - **Widget-Library**: Button, Label, Slider, ProgressBar, CheckBox, RadioButton, TextBox
 
 ### Multi-Threading (FreeRTOS)
@@ -183,11 +183,12 @@ espnow.send(peerMac, packet);
   "touch_threshold": 600,
   "espnow_heartbeat": 500,
   "espnow_timeout": 2000,
+  "autoshutdown":true,
   "debug_serial": true
 }
 ```
 
-**Vorteil:** Hardware-Defaults in `config.h`, optionales Override via SD-Karte!
+**Vorteil:** Hardware-Defaults in `setupConfig.h`.
 
 ---
 
@@ -214,6 +215,7 @@ espnow.send(peerMac, packet);
 
 ### 4. SettingsPage
 - **Backlight-Slider** (PWM 0-255, live Anpassung)
+- **Auto-Shutdown-checkbox** (live aktivieren/deaktivieren)
 - **Joystick Center-Kalibrierung** (Button)
 - **Hinweis**: Weitere Config via `config.conf` auf SD
 
@@ -280,7 +282,7 @@ https://espressif.github.io/arduino-esp32/package_esp32_index.json
 // Dann die Pins direkt in User_Setup.h eintragen:
 ```
 
-**ODER:** Pins direkt in `config.h` definieren und via `-D` Flags übergeben.
+**ODER:** Pins direkt in `setupConfig.h` definieren und via `-D` Flags übergeben.
 
 ### 3. Hardware Verkabelung
 
@@ -352,7 +354,7 @@ Sketch → Upload
 ### Serial Monitor (115200 Baud)
 
 ```cpp
-#define DEBUG_SERIAL true  // config.h
+#define DEBUG_SERIAL true  // setupConfig.h
 
 // Output-Beispiel beim Boot:
 ╔════════════════════════════════════════╗
@@ -445,7 +447,7 @@ PSRAM:  8MB  (UI-Widgets, Buffers)
 SRAM:   512KB (Stack, Heap)
 
 // Optimierungen:
-- GlobalUI: 1x Header/Footer (nicht pro Page!)
+- UILayout: 1x Header/Footer (nicht pro Page!)
 - UI-Widgets: Lazy Creation (nur bei build())
 - ESP-NOW: Queue-basiert (RX/TX/Result)
 - JSON: ArduinoJson V7 (optimierte Deserialisierung)
@@ -458,12 +460,12 @@ SRAM:   512KB (Stack, Heap)
 Display Backlight (max): ~200mA @ 3.3V
 ESP32-S3 Active:         ~100mA @ 5V
 Display + Touch:         ~50mA @ 5V
-ESP-NOW TX (continuous): ~120mA @ 3.3V
+ESP-NOW TX (continuous): ~120mA @ 3.3V (nicht getestet)
 -------------------------------------------
 TOTAL (worst case):      ~470mA @ 3.3V
 
 // 2S LiPo 2000mAh:
-Laufzeit: ~4 Stunden (kontinuierlich)
+Laufzeit: ~6 - 8 Stunden (kontinuierlich)
 ```
 
 ### Joystick Deadzone
@@ -495,7 +497,7 @@ joystick.setUpdateInterval(50);  // 50ms = 20Hz (langsamer)
 ### ESP-NOW Heartbeat
 
 ```cpp
-// config.h oder config.conf
+// userConfig.h oder config.conf
 #define ESPNOW_HEARTBEAT_INTERVAL 500  // 500ms = 2Hz
 #define ESPNOW_TIMEOUT_MS 2000         // 2s Timeout
 ```
@@ -504,7 +506,7 @@ joystick.setUpdateInterval(50);  // 50ms = 20Hz (langsamer)
 
 ```cpp
 // Settings-Page: Slider 0-255
-// Oder in config.h:
+// Oder in userConfig.h oder config.conf:
 #define BACKLIGHT_DEFAULT 128  // 50% Helligkeit
 ```
 
@@ -533,7 +535,7 @@ Fragen oder Verbesserungsvorschläge? Erstelle ein Issue auf GitHub!
 
 ---
 
-## 📸 Hardware-Bilder
+## 📸 Hardware-Bilder (in arbeit)
 
 - **ESP32-S3-N16R8 Board Pinout** - Vollständige Pin-Belegung
 - **ST7796 4" TFT Display mit SD-Slot** - Display-Modul
