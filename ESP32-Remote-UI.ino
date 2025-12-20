@@ -204,18 +204,24 @@ void setup() {
         // Events für Logging registrieren
         espNow.onEvent(EspNowEvent::PEER_CONNECTED, [](EspNowEventData* data) {
             String mac = EspNowManager::macToString(data->mac);
+        espNow.onEvent(ESPNowEvent::PEER_CONNECTED, [](ESPNowEventData* data) {
+            String mac = ESPNowManager::macToString(data->mac);
             logger.logConnection(mac.c_str(), "connected");
             Serial.printf("ESP-NOW: Peer %s connected\n", mac.c_str());
         });
         
         espNow.onEvent(EspNowEvent::PEER_DISCONNECTED, [](EspNowEventData* data) {
             String mac = EspNowManager::macToString(data->mac);
+        espNow.onEvent(ESPNowEvent::PEER_DISCONNECTED, [](ESPNowEventData* data) {
+            String mac = ESPNowManager::macToString(data->mac);
             logger.logConnection(mac.c_str(), "disconnected");
             Serial.printf("ESP-NOW: Peer %s disconnected\n", mac.c_str());
         });
         
         espNow.onEvent(EspNowEvent::HEARTBEAT_TIMEOUT, [](EspNowEventData* data) {
             String mac = EspNowManager::macToString(data->mac);
+        espNow.onEvent(ESPNowEvent::HEARTBEAT_TIMEOUT, [](ESPNowEventData* data) {
+            String mac = ESPNowManager::macToString(data->mac);
             logger.logConnection(mac.c_str(), "timeout");
             Serial.printf("ESP-NOW: Peer %s timeout\n", mac.c_str());
         });
@@ -345,12 +351,14 @@ void loop() {
         // Via ESP-NOW senden
         if (espNow.isConnected()) {
             EspNowPacket packet;
+            ESPNowPacket packet;
             packet.begin(MainCmd::DATA_REQUEST)
                   .addInt16(DataCmd::JOYSTICK_X, joyX)
                   .addInt16(DataCmd::JOYSTICK_Y, joyY);
             
             uint8_t peerMac[6];
             if (EspNowManager::stringToMac(userConfig.getEspnowPeerMac(), peerMac)) {
+            if (ESPNowManager::stringToMac(userConfig.getEspnowPeerMac(), peerMac)) {
                 espNow.send(peerMac, packet);
             }
         }

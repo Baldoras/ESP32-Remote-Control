@@ -1,5 +1,5 @@
 /**
- * EspNowManager.h
+ * ESPNowManager.h
  * 
  * Universelle ESP-NOW Kommunikationsklasse mit TLV-Protokoll
  * 
@@ -112,8 +112,8 @@ enum class DataCmd : uint8_t {
 // FORWARD DECLARATIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-class EspNowManager;
-class EspNowPacket;
+class ESPNowManager;
+class ESPNowPacket;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // QUEUE STRUKTUREN (für Thread-Kommunikation)
@@ -181,10 +181,10 @@ struct ResultQueueItem {
  * 
  * Protokoll: [MAIN_CMD] [TOTAL_LEN] [SUB_CMD] [LEN] [DATA] [SUB_CMD] [LEN] [DATA] ...
  */
-class EspNowPacket {
+class ESPNowPacket {
 public:
-    EspNowPacket();
-    ~EspNowPacket();
+    ESPNowPacket();
+    ~ESPNowPacket();
     
     // ═══════════════════════════════════════════════════════════════════════
     // BUILDER-PATTERN
@@ -195,7 +195,7 @@ public:
      * @param cmd Haupt-Command
      * @return Referenz für Method-Chaining
      */
-    EspNowPacket& begin(MainCmd cmd);
+    ESPNowPacket& begin(MainCmd cmd);
     
     /**
      * Sub-Daten hinzufügen
@@ -204,48 +204,48 @@ public:
      * @param len Datenlänge
      * @return Referenz für Method-Chaining
      */
-    EspNowPacket& add(DataCmd dataCmd, const void* data, size_t len);
+    ESPNowPacket& add(DataCmd dataCmd, const void* data, size_t len);
     
     /**
      * Einzelnes Byte hinzufügen
      */
-    EspNowPacket& addByte(DataCmd dataCmd, uint8_t value);
+    ESPNowPacket& addByte(DataCmd dataCmd, uint8_t value);
     
     /**
      * int8_t hinzufügen
      */
-    EspNowPacket& addInt8(DataCmd dataCmd, int8_t value);
+    ESPNowPacket& addInt8(DataCmd dataCmd, int8_t value);
     
     /**
      * uint16_t hinzufügen
      */
-    EspNowPacket& addUInt16(DataCmd dataCmd, uint16_t value);
+    ESPNowPacket& addUInt16(DataCmd dataCmd, uint16_t value);
     
     /**
      * int16_t hinzufügen
      */
-    EspNowPacket& addInt16(DataCmd dataCmd, int16_t value);
+    ESPNowPacket& addInt16(DataCmd dataCmd, int16_t value);
     
     /**
      * uint32_t hinzufügen
      */
-    EspNowPacket& addUInt32(DataCmd dataCmd, uint32_t value);
+    ESPNowPacket& addUInt32(DataCmd dataCmd, uint32_t value);
     
     /**
      * int32_t hinzufügen
      */
-    EspNowPacket& addInt32(DataCmd dataCmd, int32_t value);
+    ESPNowPacket& addInt32(DataCmd dataCmd, int32_t value);
     
     /**
      * float hinzufügen
      */
-    EspNowPacket& addFloat(DataCmd dataCmd, float value);
+    ESPNowPacket& addFloat(DataCmd dataCmd, float value);
     
     /**
      * Struct hinzufügen (Template)
      */
     template<typename T>
-    EspNowPacket& addStruct(DataCmd dataCmd, const T& data) {
+    ESPNowPacket& addStruct(DataCmd dataCmd, const T& data) {
         return add(dataCmd, &data, sizeof(T));
     }
     
@@ -394,7 +394,7 @@ private:
 /**
  * Peer-Information
  */
-struct EspNowPeer {
+struct ESPNowPeer {
     uint8_t mac[6];             // MAC-Adresse
     bool connected;             // Verbindungsstatus
     unsigned long lastSeen;     // Letzter Empfang (millis)
@@ -411,7 +411,7 @@ struct EspNowPeer {
 /**
  * ESP-NOW Event-Typen
  */
-enum class EspNowEvent : uint8_t {
+enum class ESPNowEvent : uint8_t {
     NONE = 0,
     DATA_RECEIVED,      // Daten empfangen
     DATA_SENT,          // Daten gesendet (mit Status)
@@ -428,23 +428,23 @@ enum class EspNowEvent : uint8_t {
 /**
  * Event-Daten Struktur
  */
-struct EspNowEventData {
-    EspNowEvent event;          // Event-Typ
+struct ESPNowEventData {
+    ESPNowEvent event;          // Event-Typ
     uint8_t mac[6];             // MAC des Peers
-    EspNowPacket* packet;       // Parsed Packet (nur bei DATA_RECEIVED)
+    ESPNowPacket* packet;       // Parsed Packet (nur bei DATA_RECEIVED)
     bool success;               // Erfolg (bei SEND)
 };
 
 // Callback-Typen
-typedef std::function<void(const uint8_t* mac, EspNowPacket& packet)> EspNowReceiveCallback;
-typedef std::function<void(const uint8_t* mac, bool success)> EspNowSendCallback;
-typedef std::function<void(EspNowEventData* eventData)> EspNowEventCallback;
+typedef std::function<void(const uint8_t* mac, ESPNowPacket& packet)> ESPNowReceiveCallback;
+typedef std::function<void(const uint8_t* mac, bool success)> ESPNowSendCallback;
+typedef std::function<void(ESPNowEventData* eventData)> ESPNowEventCallback;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HAUPTKLASSE
 // ═══════════════════════════════════════════════════════════════════════════
 
-class EspNowManager {
+class ESPNowManager {
 public:
     
     /**
@@ -457,8 +457,8 @@ public:
     /**
      * Konstruktor & Destruktor (public für globale Instanz)
      */
-    EspNowManager();
-    ~EspNowManager();
+    ESPNowManager();
+    ~ESPNowManager();
 
     /**
      * ESP-NOW beenden und aufräumen
@@ -500,7 +500,7 @@ public:
     /**
      * Peer-Info abrufen
      */
-    EspNowPeer* getPeer(const uint8_t* mac);
+    ESPNowPeer* getPeer(const uint8_t* mac);
 
     /**
      * Anzahl registrierter Peers
@@ -527,13 +527,13 @@ public:
      * @param packet Zu sendendes Paket
      * @return true wenn in Queue eingereiht
      */
-    bool send(const uint8_t* mac, const EspNowPacket& packet);
+    bool send(const uint8_t* mac, const ESPNowPacket& packet);
 
     /**
      * Paket an alle Peers senden
      * @return true wenn in Queue eingereiht
      */
-    bool broadcast(const EspNowPacket& packet);
+    bool broadcast(const ESPNowPacket& packet);
 
     /**
      * Heartbeat manuell senden
@@ -590,22 +590,22 @@ public:
     /**
      * Empfangs-Callback setzen (wird im Worker-Thread aufgerufen!)
      */
-    void setReceiveCallback(EspNowReceiveCallback callback);
+    void setReceiveCallback(ESPNowReceiveCallback callback);
 
     /**
      * Sende-Callback setzen
      */
-    void setSendCallback(EspNowSendCallback callback);
+    void setSendCallback(ESPNowSendCallback callback);
 
     /**
      * Event-Callback setzen (UI-Integration, im Main-Thread via update())
      */
-    void onEvent(EspNowEvent event, EspNowEventCallback callback);
+    void onEvent(ESPNowEvent event, ESPNowEventCallback callback);
 
     /**
      * Event-Callback entfernen
      */
-    void offEvent(EspNowEvent event);
+    void offEvent(ESPNowEvent event);
 
     // ═══════════════════════════════════════════════════════════════════════
     // UPDATE & STATUS
@@ -656,7 +656,7 @@ private:
     uint8_t maxPeersLimit;       // User-konfigurierbares Peer-Limit (1-20)
 
     // Peers (mit Mutex geschützt)
-    std::vector<EspNowPeer> peers;
+    std::vector<ESPNowPeer> peers;
     SemaphoreHandle_t peersMutex;
 
     // Heartbeat
@@ -675,9 +675,9 @@ private:
     volatile bool workerRunning;
 
     // Callbacks
-    EspNowReceiveCallback receiveCallback;
-    EspNowSendCallback sendCallback;
-    EspNowEventCallback eventCallbacks[12];
+    ESPNowReceiveCallback receiveCallback;
+    ESPNowSendCallback sendCallback;
+    ESPNowEventCallback eventCallbacks[12];
 
     // Statische Callbacks für ESP-NOW
     static void onDataRecvStatic(const esp_now_recv_info_t* info, const uint8_t* data, int len);
@@ -691,12 +691,12 @@ private:
     // Interne Methoden
     void handleSendStatus(const uint8_t* mac, bool success);
     void checkTimeouts();
-    void triggerEvent(EspNowEvent event, EspNowEventData* data);
+    void triggerEvent(ESPNowEvent event, ESPNowEventData* data);
     int findPeerIndex(const uint8_t* mac);
     bool compareMac(const uint8_t* mac1, const uint8_t* mac2);
     
     // Paket zu Result konvertieren (im Worker-Thread)
-    void packetToResult(const uint8_t* mac, EspNowPacket& packet, ResultQueueItem& result);
+    void packetToResult(const uint8_t* mac, ESPNowPacket& packet, ResultQueueItem& result);
 };
 
 #endif // ESP_NOW_MANAGER_H

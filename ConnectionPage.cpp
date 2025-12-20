@@ -123,7 +123,7 @@ void ConnectionPage::setPeerMac(const char* macStr) {
     // Nur Daten speichern - Label wird in build() initialisiert
     strncpy(peerMacStr, macStr, sizeof(peerMacStr) - 1);
     peerMacStr[sizeof(peerMacStr) - 1] = '\0';
-    EspNowManager::stringToMac(macStr, peerMac);
+    ESPNowManager::stringToMac(macStr, peerMac);
     
     Serial.printf("ConnectionPage: Peer MAC gespeichert: %s\n", peerMacStr);
 }

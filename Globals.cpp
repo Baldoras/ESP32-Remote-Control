@@ -29,7 +29,7 @@ LogHandler logger(nullptr, LOG_INFO);  // Startet ohne SD, nur Serial, Level INF
 TouchManager touch;
 UserConfig userConfig;
 PowerManager powerMgr;
-EspNowManager espNow;
+ESPNowManager espNow;
 
 // PageManager als Pointer (wird in setup() erstellt)
 PageManager* pageManager = nullptr;

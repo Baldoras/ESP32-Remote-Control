@@ -1,18 +1,18 @@
 /**
- * EspNowManager.cpp
+ * ESPNowManager.cpp
  * 
  * Implementation der universellen ESP-NOW Kommunikationsklasse
  * mit TLV-Protokoll, Builder-Pattern und Parser
  */
 
-#include "include/EspNowManager.h"
+#include "include/ESPNowManager.h"
 #include <esp_wifi.h>
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESPNOWPACKET - BUILDER & PARSER
 // ═══════════════════════════════════════════════════════════════════════════
 
-EspNowPacket::EspNowPacket()
+ESPNowPacket::ESPNowPacket()
     : entryCount(0)
     , mainCmd(MainCmd::NONE)
     , dataLength(0)
@@ -23,14 +23,14 @@ EspNowPacket::EspNowPacket()
     memset(entries, 0, sizeof(entries));
 }
 
-EspNowPacket::~EspNowPacket() {
+ESPNowPacket::~ESPNowPacket() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BUILDER
 // ─────────────────────────────────────────────────────────────────────────────
 
-EspNowPacket& EspNowPacket::begin(MainCmd cmd) {
+ESPNowPacket& ESPNowPacket::begin(MainCmd cmd) {
     clear();
     mainCmd = cmd;
     buffer[0] = static_cast<uint8_t>(cmd);
@@ -41,19 +41,19 @@ EspNowPacket& EspNowPacket::begin(MainCmd cmd) {
     return *this;
 }
 
-EspNowPacket& EspNowPacket::add(DataCmd dataCmd, const void* data, size_t len) {
+ESPNowPacket& ESPNowPacket::add(DataCmd dataCmd, const void* data, size_t len) {
     if (!valid) return *this;
     
     // Prüfen ob noch Platz
     // Benötigt: 2 Byte (SUB_CMD + LEN) + Daten
     if (writePos + 2 + len > ESPNOW_MAX_PACKET_SIZE) {
-        DEBUG_PRINTLN("EspNowPacket: ❌ Kein Platz mehr im Paket!");
+        DEBUG_PRINTLN("ESPNowPacket: ❌ Kein Platz mehr im Paket!");
         return *this;
     }
     
     // Prüfen ob noch Einträge frei
     if (entryCount >= MAX_ENTRIES) {
-        DEBUG_PRINTLN("EspNowPacket: ❌ Maximale Einträge erreicht!");
+        DEBUG_PRINTLN("ESPNowPacket: ❌ Maximale Einträge erreicht!");
         return *this;
     }
     
@@ -83,31 +83,31 @@ EspNowPacket& EspNowPacket::add(DataCmd dataCmd, const void* data, size_t len) {
     return *this;
 }
 
-EspNowPacket& EspNowPacket::addByte(DataCmd dataCmd, uint8_t value) {
+ESPNowPacket& ESPNowPacket::addByte(DataCmd dataCmd, uint8_t value) {
     return add(dataCmd, &value, 1);
 }
 
-EspNowPacket& EspNowPacket::addInt8(DataCmd dataCmd, int8_t value) {
+ESPNowPacket& ESPNowPacket::addInt8(DataCmd dataCmd, int8_t value) {
     return add(dataCmd, &value, 1);
 }
 
-EspNowPacket& EspNowPacket::addUInt16(DataCmd dataCmd, uint16_t value) {
+ESPNowPacket& ESPNowPacket::addUInt16(DataCmd dataCmd, uint16_t value) {
     return add(dataCmd, &value, 2);
 }
 
-EspNowPacket& EspNowPacket::addInt16(DataCmd dataCmd, int16_t value) {
+ESPNowPacket& ESPNowPacket::addInt16(DataCmd dataCmd, int16_t value) {
     return add(dataCmd, &value, 2);
 }
 
-EspNowPacket& EspNowPacket::addUInt32(DataCmd dataCmd, uint32_t value) {
+ESPNowPacket& ESPNowPacket::addUInt32(DataCmd dataCmd, uint32_t value) {
     return add(dataCmd, &value, 4);
 }
 
-EspNowPacket& EspNowPacket::addInt32(DataCmd dataCmd, int32_t value) {
+ESPNowPacket& ESPNowPacket::addInt32(DataCmd dataCmd, int32_t value) {
     return add(dataCmd, &value, 4);
 }
 
-EspNowPacket& EspNowPacket::addFloat(DataCmd dataCmd, float value) {
+ESPNowPacket& ESPNowPacket::addFloat(DataCmd dataCmd, float value) {
     return add(dataCmd, &value, 4);
 }
 
@@ -115,12 +115,12 @@ EspNowPacket& EspNowPacket::addFloat(DataCmd dataCmd, float value) {
 // PARSER
 // ─────────────────────────────────────────────────────────────────────────────
 
-bool EspNowPacket::parse(const uint8_t* rawData, size_t len) {
+bool ESPNowPacket::parse(const uint8_t* rawData, size_t len) {
     clear();
     
     // Mindestlänge prüfen (MAIN_CMD + TOTAL_LEN)
     if (!rawData || len < 2) {
-        DEBUG_PRINTLN("EspNowPacket: ❌ Paket zu klein");
+        DEBUG_PRINTLN("ESPNowPacket: ❌ Paket zu klein");
         return false;
     }
     
@@ -130,7 +130,7 @@ bool EspNowPacket::parse(const uint8_t* rawData, size_t len) {
     
     // Längenprüfung
     if (totalLen > len - 2) {
-        DEBUG_PRINTF("EspNowPacket: ❌ Ungültige Länge: %d > %d\n", totalLen, len - 2);
+        DEBUG_PRINTF("ESPNowPacket: ❌ Ungültige Länge: %d > %d\n", totalLen, len - 2);
         return false;
     }
     
@@ -147,7 +147,7 @@ bool EspNowPacket::parse(const uint8_t* rawData, size_t len) {
         
         // Prüfen ob Daten noch im Paket
         if (pos + 2 + subLen > 2 + totalLen) {
-            DEBUG_PRINTLN("EspNowPacket: ⚠️ Truncated sub-entry");
+            DEBUG_PRINTLN("ESPNowPacket: ⚠️ Truncated sub-entry");
             break;
         }
         
@@ -166,11 +166,11 @@ bool EspNowPacket::parse(const uint8_t* rawData, size_t len) {
     return true;
 }
 
-bool EspNowPacket::has(DataCmd dataCmd) const {
+bool ESPNowPacket::has(DataCmd dataCmd) const {
     return findEntry(dataCmd) >= 0;
 }
 
-const uint8_t* EspNowPacket::getData(DataCmd dataCmd, size_t* outLen) const {
+const uint8_t* ESPNowPacket::getData(DataCmd dataCmd, size_t* outLen) const {
     int idx = findEntry(dataCmd);
     if (idx < 0) {
         if (outLen) *outLen = 0;
@@ -183,7 +183,7 @@ const uint8_t* EspNowPacket::getData(DataCmd dataCmd, size_t* outLen) const {
     return &buffer[entries[idx].offset + 2];
 }
 
-bool EspNowPacket::getByte(DataCmd dataCmd, uint8_t& outValue) const {
+bool ESPNowPacket::getByte(DataCmd dataCmd, uint8_t& outValue) const {
     const uint8_t* data = get<uint8_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -192,7 +192,7 @@ bool EspNowPacket::getByte(DataCmd dataCmd, uint8_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getInt8(DataCmd dataCmd, int8_t& outValue) const {
+bool ESPNowPacket::getInt8(DataCmd dataCmd, int8_t& outValue) const {
     const int8_t* data = get<int8_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -201,7 +201,7 @@ bool EspNowPacket::getInt8(DataCmd dataCmd, int8_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getUInt16(DataCmd dataCmd, uint16_t& outValue) const {
+bool ESPNowPacket::getUInt16(DataCmd dataCmd, uint16_t& outValue) const {
     const uint16_t* data = get<uint16_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -210,7 +210,7 @@ bool EspNowPacket::getUInt16(DataCmd dataCmd, uint16_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getInt16(DataCmd dataCmd, int16_t& outValue) const {
+bool ESPNowPacket::getInt16(DataCmd dataCmd, int16_t& outValue) const {
     const int16_t* data = get<int16_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -219,7 +219,7 @@ bool EspNowPacket::getInt16(DataCmd dataCmd, int16_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getUInt32(DataCmd dataCmd, uint32_t& outValue) const {
+bool ESPNowPacket::getUInt32(DataCmd dataCmd, uint32_t& outValue) const {
     const uint32_t* data = get<uint32_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -228,7 +228,7 @@ bool EspNowPacket::getUInt32(DataCmd dataCmd, uint32_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getInt32(DataCmd dataCmd, int32_t& outValue) const {
+bool ESPNowPacket::getInt32(DataCmd dataCmd, int32_t& outValue) const {
     const int32_t* data = get<int32_t>(dataCmd);
     if (data) {
         outValue = *data;
@@ -237,7 +237,7 @@ bool EspNowPacket::getInt32(DataCmd dataCmd, int32_t& outValue) const {
     return false;
 }
 
-bool EspNowPacket::getFloat(DataCmd dataCmd, float& outValue) const {
+bool ESPNowPacket::getFloat(DataCmd dataCmd, float& outValue) const {
     const float* data = get<float>(dataCmd);
     if (data) {
         outValue = *data;
@@ -250,7 +250,7 @@ bool EspNowPacket::getFloat(DataCmd dataCmd, float& outValue) const {
 // HELPER
 // ─────────────────────────────────────────────────────────────────────────────
 
-void EspNowPacket::clear() {
+void ESPNowPacket::clear() {
     memset(buffer, 0, ESPNOW_MAX_PACKET_SIZE);
     memset(entries, 0, sizeof(entries));
     entryCount = 0;
@@ -260,7 +260,7 @@ void EspNowPacket::clear() {
     valid = false;
 }
 
-int EspNowPacket::findEntry(DataCmd cmd) const {
+int ESPNowPacket::findEntry(DataCmd cmd) const {
     for (int i = 0; i < entryCount; i++) {
         if (entries[i].cmd == cmd) {
             return i;
@@ -269,8 +269,8 @@ int EspNowPacket::findEntry(DataCmd cmd) const {
     return -1;
 }
 
-void EspNowPacket::print() const {
-    DEBUG_PRINTLN("\n─── EspNowPacket ───────────────────────────");
+void ESPNowPacket::print() const {
+    DEBUG_PRINTLN("\n─── ESPNowPacket ───────────────────────────");
     DEBUG_PRINTF("MainCmd:    0x%02X\n", static_cast<uint8_t>(mainCmd));
     DEBUG_PRINTF("DataLength: %d\n", dataLength);
     DEBUG_PRINTF("Entries:    %d\n", entryCount);
@@ -296,7 +296,7 @@ void EspNowPacket::print() const {
 
 // ═══════════════════════════════════════════════════════════════════════════
 
-EspNowManager::EspNowManager()
+ESPNowManager::ESPNowManager()
     : initialized(false)
     , wifiChannel(0)
     , maxPeersLimit(5)           // Default: 5 Peers
@@ -318,7 +318,7 @@ EspNowManager::EspNowManager()
     }
 }
 
-EspNowManager::~EspNowManager() {
+ESPNowManager::~ESPNowManager() {
     end();
 }
 
@@ -326,13 +326,13 @@ EspNowManager::~EspNowManager() {
 // INITIALISIERUNG
 // ═══════════════════════════════════════════════════════════════════════════
 
-bool EspNowManager::begin(uint8_t channel) {
+bool ESPNowManager::begin(uint8_t channel) {
     if (initialized) {
-        DEBUG_PRINTLN("EspNowManager: Bereits initialisiert");
+        DEBUG_PRINTLN("ESPNowManager: Bereits initialisiert");
         return true;
     }
 
-    DEBUG_PRINTLN("EspNowManager: Initialisiere ESP-NOW...");
+    DEBUG_PRINTLN("ESPNowManager: Initialisiere ESP-NOW...");
 
     // ═══════════════════════════════════════════════════════════════════════
     // FreeRTOS Ressourcen erstellen
@@ -341,7 +341,7 @@ bool EspNowManager::begin(uint8_t channel) {
     // Mutex für Peer-Liste
     peersMutex = xSemaphoreCreateMutex();
     if (!peersMutex) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Mutex erstellen fehlgeschlagen!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Mutex erstellen fehlgeschlagen!");
         return false;
     }
     
@@ -351,12 +351,12 @@ bool EspNowManager::begin(uint8_t channel) {
     resultQueue = xQueueCreate(ESPNOW_RESULT_QUEUE_SIZE, sizeof(ResultQueueItem));
     
     if (!rxQueue || !txQueue || !resultQueue) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Queue erstellen fehlgeschlagen!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Queue erstellen fehlgeschlagen!");
         end();
         return false;
     }
     
-    DEBUG_PRINTLN("EspNowManager: ✅ Queues erstellt");
+    DEBUG_PRINTLN("ESPNowManager: ✅ Queues erstellt");
 
     // ═══════════════════════════════════════════════════════════════════════
     // WiFi & ESP-NOW initialisieren
@@ -372,7 +372,7 @@ bool EspNowManager::begin(uint8_t channel) {
 
     esp_err_t result = esp_now_init();
     if (result != ESP_OK) {
-        DEBUG_PRINTF("EspNowManager: ❌ esp_now_init() fehlgeschlagen: %d\n", result);
+        DEBUG_PRINTF("ESPNowManager: ❌ esp_now_init() fehlgeschlagen: %d\n", result);
         end();
         return false;
     }
@@ -389,7 +389,7 @@ bool EspNowManager::begin(uint8_t channel) {
     
     BaseType_t taskResult = xTaskCreatePinnedToCore(
         workerTask,                     // Task-Funktion
-        "EspNowWorker",                 // Name
+        "ESPNowWorker",                 // Name
         ESPNOW_WORKER_STACK_SIZE,       // Stack-Größe
         this,                           // Parameter (this-Pointer)
         ESPNOW_WORKER_PRIORITY,         // Priorität
@@ -398,27 +398,27 @@ bool EspNowManager::begin(uint8_t channel) {
     );
     
     if (taskResult != pdPASS) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Worker-Task erstellen fehlgeschlagen!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Worker-Task erstellen fehlgeschlagen!");
         workerRunning = false;
         end();
         return false;
     }
     
-    DEBUG_PRINTF("EspNowManager: ✅ Worker-Task gestartet (Core %d, Prio %d)\n", 
+    DEBUG_PRINTF("ESPNowManager: ✅ Worker-Task gestartet (Core %d, Prio %d)\n", 
                  ESPNOW_WORKER_CORE, ESPNOW_WORKER_PRIORITY);
 
     initialized = true;
 
-    DEBUG_PRINTLN("EspNowManager: ✅ ESP-NOW initialisiert");
-    DEBUG_PRINTF("EspNowManager: MAC: %s, Kanal: %d\n", getOwnMacString().c_str(), wifiChannel);
+    DEBUG_PRINTLN("ESPNowManager: ✅ ESP-NOW initialisiert");
+    DEBUG_PRINTF("ESPNowManager: MAC: %s, Kanal: %d\n", getOwnMacString().c_str(), wifiChannel);
 
     return true;
 }
 
-void EspNowManager::end() {
+void ESPNowManager::end() {
     if (!initialized && !workerTaskHandle) return;
 
-    DEBUG_PRINTLN("EspNowManager: Beende ESP-NOW...");
+    DEBUG_PRINTLN("ESPNowManager: Beende ESP-NOW...");
     
     // Worker-Task stoppen
     if (workerTaskHandle) {
@@ -426,7 +426,7 @@ void EspNowManager::end() {
         vTaskDelay(pdMS_TO_TICKS(100));  // Warten bis Task beendet
         vTaskDelete(workerTaskHandle);
         workerTaskHandle = nullptr;
-        DEBUG_PRINTLN("EspNowManager: Worker-Task beendet");
+        DEBUG_PRINTLN("ESPNowManager: Worker-Task beendet");
     }
     
     // Peers entfernen
@@ -458,18 +458,18 @@ void EspNowManager::end() {
     }
     
     initialized = false;
-    DEBUG_PRINTLN("EspNowManager: ✅ ESP-NOW beendet");
+    DEBUG_PRINTLN("ESPNowManager: ✅ ESP-NOW beendet");
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PEER-VERWALTUNG (Thread-safe mit Mutex)
 // ═══════════════════════════════════════════════════════════════════════════
 
-bool EspNowManager::addPeer(const uint8_t* mac, bool encrypt) {
+bool ESPNowManager::addPeer(const uint8_t* mac, bool encrypt) {
     if (!initialized || !mac) return false;
 
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Mutex-Timeout bei addPeer");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Mutex-Timeout bei addPeer");
         return false;
     }
 
@@ -477,14 +477,14 @@ bool EspNowManager::addPeer(const uint8_t* mac, bool encrypt) {
     
     // Prüfen ob bereits vorhanden
     if (findPeerIndex(mac) >= 0) {
-        DEBUG_PRINTF("EspNowManager: Peer %s existiert bereits\n", macToString(mac).c_str());
+        DEBUG_PRINTF("ESPNowManager: Peer %s existiert bereits\n", macToString(mac).c_str());
         result = true;
     }
     else if (peers.size() >= maxPeersLimit) {
-        DEBUG_PRINTF("EspNowManager: ❌ User-Limit erreicht (%d/%d Peers)\n", peers.size(), maxPeersLimit);
+        DEBUG_PRINTF("ESPNowManager: ❌ User-Limit erreicht (%d/%d Peers)\n", peers.size(), maxPeersLimit);
     }
     else if (peers.size() >= ESPNOW_MAX_PEERS_LIMIT) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Hardware-Limit erreicht!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Hardware-Limit erreicht!");
     }
     else {
         esp_now_peer_info_t peerInfo = {};
@@ -494,10 +494,10 @@ bool EspNowManager::addPeer(const uint8_t* mac, bool encrypt) {
 
         esp_err_t espResult = esp_now_add_peer(&peerInfo);
         if (espResult != ESP_OK) {
-            DEBUG_PRINTF("EspNowManager: ❌ esp_now_add_peer() fehlgeschlagen: %d\n", espResult);
+            DEBUG_PRINTF("ESPNowManager: ❌ esp_now_add_peer() fehlgeschlagen: %d\n", espResult);
         }
         else {
-            EspNowPeer newPeer;
+            ESPNowPeer newPeer;
             memcpy(newPeer.mac, mac, 6);
             newPeer.connected = false;
             newPeer.lastSeen = 0;
@@ -509,23 +509,23 @@ bool EspNowManager::addPeer(const uint8_t* mac, bool encrypt) {
             peers.push_back(newPeer);
             result = true;
 
-            DEBUG_PRINTF("EspNowManager: ✅ Peer hinzugefügt: %s\n", macToString(mac).c_str());
+            DEBUG_PRINTF("ESPNowManager: ✅ Peer hinzugefügt: %s\n", macToString(mac).c_str());
         }
     }
 
     xSemaphoreGive(peersMutex);
 
     if (result) {
-        EspNowEventData eventData = {};
-        eventData.event = EspNowEvent::PEER_ADDED;
+        ESPNowEventData eventData = {};
+        eventData.event = ESPNowEvent::PEER_ADDED;
         memcpy(eventData.mac, mac, 6);
-        triggerEvent(EspNowEvent::PEER_ADDED, &eventData);
+        triggerEvent(ESPNowEvent::PEER_ADDED, &eventData);
     }
 
     return result;
 }
 
-bool EspNowManager::removePeer(const uint8_t* mac) {
+bool ESPNowManager::removePeer(const uint8_t* mac) {
     if (!initialized || !mac) return false;
 
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(100)) != pdTRUE) {
@@ -539,22 +539,22 @@ bool EspNowManager::removePeer(const uint8_t* mac) {
         esp_now_del_peer(mac);
         peers.erase(peers.begin() + index);
         result = true;
-        DEBUG_PRINTF("EspNowManager: ✅ Peer entfernt: %s\n", macToString(mac).c_str());
+        DEBUG_PRINTF("ESPNowManager: ✅ Peer entfernt: %s\n", macToString(mac).c_str());
     }
 
     xSemaphoreGive(peersMutex);
 
     if (result) {
-        EspNowEventData eventData = {};
-        eventData.event = EspNowEvent::PEER_REMOVED;
+        ESPNowEventData eventData = {};
+        eventData.event = ESPNowEvent::PEER_REMOVED;
         memcpy(eventData.mac, mac, 6);
-        triggerEvent(EspNowEvent::PEER_REMOVED, &eventData);
+        triggerEvent(ESPNowEvent::PEER_REMOVED, &eventData);
     }
 
     return result;
 }
 
-void EspNowManager::removeAllPeers() {
+void ESPNowManager::removeAllPeers() {
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(100)) != pdTRUE) {
         return;
     }
@@ -567,7 +567,7 @@ void EspNowManager::removeAllPeers() {
     xSemaphoreGive(peersMutex);
 }
 
-bool EspNowManager::hasPeer(const uint8_t* mac) {
+bool ESPNowManager::hasPeer(const uint8_t* mac) {
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(50)) != pdTRUE) {
         return false;
     }
@@ -576,7 +576,7 @@ bool EspNowManager::hasPeer(const uint8_t* mac) {
     return result;
 }
 
-EspNowPeer* EspNowManager::getPeer(const uint8_t* mac) {
+ESPNowPeer* ESPNowManager::getPeer(const uint8_t* mac) {
     // ACHTUNG: Nicht thread-safe! Nur aus Main-Thread aufrufen
     int index = findPeerIndex(mac);
     if (index >= 0) {
@@ -585,7 +585,7 @@ EspNowPeer* EspNowManager::getPeer(const uint8_t* mac) {
     return nullptr;
 }
 
-bool EspNowManager::isConnected() {
+bool ESPNowManager::isConnected() {
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(50)) != pdTRUE) {
         return false;
     }
@@ -600,7 +600,7 @@ bool EspNowManager::isConnected() {
     return result;
 }
 
-bool EspNowManager::isPeerConnected(const uint8_t* mac) {
+bool ESPNowManager::isPeerConnected(const uint8_t* mac) {
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(50)) != pdTRUE) {
         return false;
     }
@@ -617,14 +617,14 @@ bool EspNowManager::isPeerConnected(const uint8_t* mac) {
 // DATEN SENDEN (via TX-Queue)
 // ═══════════════════════════════════════════════════════════════════════════
 
-bool EspNowManager::send(const uint8_t* mac, const EspNowPacket& packet) {
+bool ESPNowManager::send(const uint8_t* mac, const ESPNowPacket& packet) {
     if (!initialized || !txQueue) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Nicht initialisiert!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Nicht initialisiert!");
         return false;
     }
 
     if (!packet.isValid()) {
-        DEBUG_PRINTLN("EspNowManager: ❌ Ungültiges Paket!");
+        DEBUG_PRINTLN("ESPNowManager: ❌ Ungültiges Paket!");
         return false;
     }
 
@@ -643,19 +643,19 @@ bool EspNowManager::send(const uint8_t* mac, const EspNowPacket& packet) {
 
     // In Queue einreihen (non-blocking)
     if (xQueueSend(txQueue, &item, 0) != pdTRUE) {
-        DEBUG_PRINTLN("EspNowManager: ⚠️ TX-Queue voll!");
+        DEBUG_PRINTLN("ESPNowManager: ⚠️ TX-Queue voll!");
         return false;
     }
 
     return true;
 }
 
-bool EspNowManager::broadcast(const EspNowPacket& packet) {
+bool ESPNowManager::broadcast(const ESPNowPacket& packet) {
     return send(nullptr, packet);
 }
 
-void EspNowManager::sendHeartbeat() {
-    EspNowPacket hb;
+void ESPNowManager::sendHeartbeat() {
+    ESPNowPacket hb;
     hb.begin(MainCmd::HEARTBEAT);
     
     if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(50)) == pdTRUE) {
@@ -670,27 +670,27 @@ void EspNowManager::sendHeartbeat() {
 // HEARTBEAT & TIMEOUT
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::setHeartbeat(bool enabled, uint32_t intervalMs) {
+void ESPNowManager::setHeartbeat(bool enabled, uint32_t intervalMs) {
     heartbeatEnabled = enabled;
     heartbeatInterval = intervalMs;
-    DEBUG_PRINTF("EspNowManager: Heartbeat %s (%dms)\n", enabled ? "AN" : "AUS", intervalMs);
+    DEBUG_PRINTF("ESPNowManager: Heartbeat %s (%dms)\n", enabled ? "AN" : "AUS", intervalMs);
 }
 
-void EspNowManager::setTimeout(uint32_t timeout) {
+void ESPNowManager::setTimeout(uint32_t timeout) {
     timeoutMs = timeout;
-    DEBUG_PRINTF("EspNowManager: Timeout: %dms\n", timeout);
+    DEBUG_PRINTF("ESPNowManager: Timeout: %dms\n", timeout);
 
 }
-void EspNowManager::setMaxPeers(uint8_t maxPeers) {
+void ESPNowManager::setMaxPeers(uint8_t maxPeers) {
     // User-Limit validieren (1-20, nicht größer als Hardware-Limit)
     if (maxPeers == 0) maxPeers = 1;
     if (maxPeers > ESPNOW_MAX_PEERS_LIMIT) maxPeers = ESPNOW_MAX_PEERS_LIMIT;
     
     maxPeersLimit = maxPeers;
-    DEBUG_PRINTF("EspNowManager: MaxPeers Limit: %d (hardware limit: %d)\n", maxPeersLimit, ESPNOW_MAX_PEERS_LIMIT);
+    DEBUG_PRINTF("ESPNowManager: MaxPeers Limit: %d (hardware limit: %d)\n", maxPeersLimit, ESPNOW_MAX_PEERS_LIMIT);
 }
 
-void EspNowManager::checkTimeouts() {
+void ESPNowManager::checkTimeouts() {
     unsigned long now = millis();
 
     for (auto& peer : peers) {
@@ -698,13 +698,13 @@ void EspNowManager::checkTimeouts() {
             if (peer.lastSeen > 0 && (now - peer.lastSeen) > timeoutMs) {
                 peer.connected = false;
                 
-                DEBUG_PRINTF("EspNowManager: ⚠️ Peer %s Timeout!\n", macToString(peer.mac).c_str());
+                DEBUG_PRINTF("ESPNowManager: ⚠️ Peer %s Timeout!\n", macToString(peer.mac).c_str());
 
-                EspNowEventData eventData = {};
-                eventData.event = EspNowEvent::PEER_DISCONNECTED;
+                ESPNowEventData eventData = {};
+                eventData.event = ESPNowEvent::PEER_DISCONNECTED;
                 memcpy(eventData.mac, peer.mac, 6);
-                triggerEvent(EspNowEvent::PEER_DISCONNECTED, &eventData);
-                triggerEvent(EspNowEvent::HEARTBEAT_TIMEOUT, &eventData);
+                triggerEvent(ESPNowEvent::PEER_DISCONNECTED, &eventData);
+                triggerEvent(ESPNowEvent::HEARTBEAT_TIMEOUT, &eventData);
             }
         }
     }
@@ -714,29 +714,29 @@ void EspNowManager::checkTimeouts() {
 // CALLBACKS
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::setReceiveCallback(EspNowReceiveCallback callback) {
+void ESPNowManager::setReceiveCallback(ESPNowReceiveCallback callback) {
     receiveCallback = callback;
 }
 
-void EspNowManager::setSendCallback(EspNowSendCallback callback) {
+void ESPNowManager::setSendCallback(ESPNowSendCallback callback) {
     sendCallback = callback;
 }
 
-void EspNowManager::onEvent(EspNowEvent event, EspNowEventCallback callback) {
+void ESPNowManager::onEvent(ESPNowEvent event, ESPNowEventCallback callback) {
     int idx = static_cast<int>(event);
     if (idx >= 0 && idx < 12) {
         eventCallbacks[idx] = callback;
     }
 }
 
-void EspNowManager::offEvent(EspNowEvent event) {
+void ESPNowManager::offEvent(ESPNowEvent event) {
     int idx = static_cast<int>(event);
     if (idx >= 0 && idx < 12) {
         eventCallbacks[idx] = nullptr;
     }
 }
 
-void EspNowManager::triggerEvent(EspNowEvent event, EspNowEventData* data) {
+void ESPNowManager::triggerEvent(ESPNowEvent event, ESPNowEventData* data) {
     int idx = static_cast<int>(event);
     if (idx >= 0 && idx < 12 && eventCallbacks[idx]) {
         eventCallbacks[idx](data);
@@ -747,8 +747,8 @@ void EspNowManager::triggerEvent(EspNowEvent event, EspNowEventData* data) {
 // STATISCHE ESP-NOW CALLBACKS (minimal - nur Queue!)
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::onDataRecvStatic(const esp_now_recv_info_t* info, const uint8_t* data, int len) {
-    extern EspNowManager espNow;
+void ESPNowManager::onDataRecvStatic(const esp_now_recv_info_t* info, const uint8_t* data, int len) {
+    extern ESPNowManager espNow;
     
     if (!espNow.rxQueue || !info || !data || len <= 0) return;
     
@@ -763,8 +763,8 @@ void EspNowManager::onDataRecvStatic(const esp_now_recv_info_t* info, const uint
     xQueueSendFromISR(espNow.rxQueue, &item, nullptr);
 }
 
-void EspNowManager::onDataSentStatic(const wifi_tx_info_t* tx_info, esp_now_send_status_t status) {
-    extern EspNowManager espNow;
+void ESPNowManager::onDataSentStatic(const wifi_tx_info_t* tx_info, esp_now_send_status_t status) {
+    extern ESPNowManager espNow;
     // Neue API (ESP32 Arduino Core 3.x)
     espNow.handleSendStatus(nullptr, status == ESP_NOW_SEND_SUCCESS);
 }
@@ -773,10 +773,10 @@ void EspNowManager::onDataSentStatic(const wifi_tx_info_t* tx_info, esp_now_send
 // WORKER-TASK (läuft auf separatem Core)
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::workerTask(void* parameter) {
-    EspNowManager* mgr = static_cast<EspNowManager*>(parameter);
+void ESPNowManager::workerTask(void* parameter) {
+    ESPNowManager* mgr = static_cast<ESPNowManager*>(parameter);
     
-    DEBUG_PRINTLN("EspNowManager: Worker-Task gestartet");
+    DEBUG_PRINTLN("ESPNowManager: Worker-Task gestartet");
     
     while (mgr->workerRunning) {
         // RX-Queue verarbeiten
@@ -789,20 +789,20 @@ void EspNowManager::workerTask(void* parameter) {
         vTaskDelay(pdMS_TO_TICKS(1));
     }
     
-    DEBUG_PRINTLN("EspNowManager: Worker-Task beendet");
+    DEBUG_PRINTLN("ESPNowManager: Worker-Task beendet");
     vTaskDelete(nullptr);
 }
 
-void EspNowManager::processRxQueue() {
+void ESPNowManager::processRxQueue() {
     RxQueueItem rxItem;
     
     // Alle verfügbaren RX-Items verarbeiten
     while (xQueueReceive(rxQueue, &rxItem, 0) == pdTRUE) {
         
         // Paket parsen
-        EspNowPacket packet;
+        ESPNowPacket packet;
         if (!packet.parse(rxItem.data, rxItem.length)) {
-            DEBUG_PRINTLN("EspNowManager: ⚠️ Worker: Paket-Parse fehlgeschlagen");
+            DEBUG_PRINTLN("ESPNowManager: ⚠️ Worker: Paket-Parse fehlgeschlagen");
             continue;
         }
         
@@ -848,12 +848,12 @@ void EspNowManager::processRxQueue() {
         
         // In Result-Queue für Main-Thread
         if (xQueueSend(resultQueue, &result, pdMS_TO_TICKS(10)) != pdTRUE) {
-            DEBUG_PRINTLN("EspNowManager: ⚠️ Result-Queue voll!");
+            DEBUG_PRINTLN("ESPNowManager: ⚠️ Result-Queue voll!");
         }
     }
 }
 
-void EspNowManager::processTxQueue() {
+void ESPNowManager::processTxQueue() {
     TxQueueItem txItem;
     
     // Alle verfügbaren TX-Items senden
@@ -871,12 +871,12 @@ void EspNowManager::processTxQueue() {
         }
         
         if (result != ESP_OK) {
-            DEBUG_PRINTF("EspNowManager: ⚠️ Senden fehlgeschlagen: %d\n", result);
+            DEBUG_PRINTF("ESPNowManager: ⚠️ Senden fehlgeschlagen: %d\n", result);
         }
     }
 }
 
-void EspNowManager::packetToResult(const uint8_t* mac, EspNowPacket& packet, ResultQueueItem& result) {
+void ESPNowManager::packetToResult(const uint8_t* mac, ESPNowPacket& packet, ResultQueueItem& result) {
     memset(&result, 0, sizeof(ResultQueueItem));
     memcpy(result.mac, mac, 6);
     result.mainCmd = packet.getMainCmd();
@@ -939,8 +939,8 @@ void EspNowManager::packetToResult(const uint8_t* mac, EspNowPacket& packet, Res
     }
 }
 
-void EspNowManager::handleSendStatus(const uint8_t* mac, bool success) {
-    EspNowPeer* peer = getPeer(mac);
+void ESPNowManager::handleSendStatus(const uint8_t* mac, bool success) {
+    ESPNowPeer* peer = getPeer(mac);
     if (peer && !success) {
         peer->packetsLost++;
     }
@@ -949,37 +949,37 @@ void EspNowManager::handleSendStatus(const uint8_t* mac, bool success) {
         sendCallback(mac, success);
     }
 
-    EspNowEventData eventData = {};
+    ESPNowEventData eventData = {};
     memcpy(eventData.mac, mac, 6);
     eventData.success = success;
 
     if (success) {
-        eventData.event = EspNowEvent::SEND_SUCCESS;
-        triggerEvent(EspNowEvent::SEND_SUCCESS, &eventData);
+        eventData.event = ESPNowEvent::SEND_SUCCESS;
+        triggerEvent(ESPNowEvent::SEND_SUCCESS, &eventData);
     } else {
-        eventData.event = EspNowEvent::SEND_FAILED;
-        triggerEvent(EspNowEvent::SEND_FAILED, &eventData);
+        eventData.event = ESPNowEvent::SEND_FAILED;
+        triggerEvent(ESPNowEvent::SEND_FAILED, &eventData);
     }
 
-    eventData.event = EspNowEvent::DATA_SENT;
-    triggerEvent(EspNowEvent::DATA_SENT, &eventData);
+    eventData.event = ESPNowEvent::DATA_SENT;
+    triggerEvent(ESPNowEvent::DATA_SENT, &eventData);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DATEN EMPFANGEN (Main-Thread Interface)
 // ═══════════════════════════════════════════════════════════════════════════
 
-bool EspNowManager::hasData() {
+bool ESPNowManager::hasData() {
     if (!resultQueue) return false;
     return uxQueueMessagesWaiting(resultQueue) > 0;
 }
 
-bool EspNowManager::getData(ResultQueueItem* result) {
+bool ESPNowManager::getData(ResultQueueItem* result) {
     if (!resultQueue || !result) return false;
     return xQueueReceive(resultQueue, result, 0) == pdTRUE;
 }
 
-int EspNowManager::processAllData(std::function<void(const ResultQueueItem&)> callback) {
+int ESPNowManager::processAllData(std::function<void(const ResultQueueItem&)> callback) {
     if (!resultQueue || !callback) return 0;
     
     int count = 0;
@@ -997,7 +997,7 @@ int EspNowManager::processAllData(std::function<void(const ResultQueueItem&)> ca
 // UPDATE (Main-Thread)
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::update() {
+void ESPNowManager::update() {
     if (!initialized) return;
 
     unsigned long now = millis();
@@ -1017,34 +1017,34 @@ void EspNowManager::update() {
         
         // Connect-Event (MainCmd::NONE als Marker)
         if (result.mainCmd == MainCmd::NONE) {
-            DEBUG_PRINTF("EspNowManager: ✅ Peer %s verbunden\n", macToString(result.mac).c_str());
+            DEBUG_PRINTF("ESPNowManager: ✅ Peer %s verbunden\n", macToString(result.mac).c_str());
             
-            EspNowEventData eventData = {};
-            eventData.event = EspNowEvent::PEER_CONNECTED;
+            ESPNowEventData eventData = {};
+            eventData.event = ESPNowEvent::PEER_CONNECTED;
             memcpy(eventData.mac, result.mac, 6);
-            triggerEvent(EspNowEvent::PEER_CONNECTED, &eventData);
+            triggerEvent(ESPNowEvent::PEER_CONNECTED, &eventData);
             continue;
         }
         
         // Heartbeat-Event
         if (result.mainCmd == MainCmd::HEARTBEAT) {
-            EspNowEventData eventData = {};
-            eventData.event = EspNowEvent::HEARTBEAT_RECEIVED;
+            ESPNowEventData eventData = {};
+            eventData.event = ESPNowEvent::HEARTBEAT_RECEIVED;
             memcpy(eventData.mac, result.mac, 6);
-            triggerEvent(EspNowEvent::HEARTBEAT_RECEIVED, &eventData);
+            triggerEvent(ESPNowEvent::HEARTBEAT_RECEIVED, &eventData);
             continue;
         }
         
         // Data-Received Event
-        EspNowEventData eventData = {};
-        eventData.event = EspNowEvent::DATA_RECEIVED;
+        ESPNowEventData eventData = {};
+        eventData.event = ESPNowEvent::DATA_RECEIVED;
         memcpy(eventData.mac, result.mac, 6);
         eventData.packet = nullptr;  // Packet nicht mehr verfügbar, Daten in result
-        triggerEvent(EspNowEvent::DATA_RECEIVED, &eventData);
+        triggerEvent(ESPNowEvent::DATA_RECEIVED, &eventData);
     }
 }
 
-void EspNowManager::getQueueStats(int* rxPending, int* txPending, int* resultPending) {
+void ESPNowManager::getQueueStats(int* rxPending, int* txPending, int* resultPending) {
     if (rxPending) *rxPending = rxQueue ? uxQueueMessagesWaiting(rxQueue) : 0;
     if (txPending) *txPending = txQueue ? uxQueueMessagesWaiting(txQueue) : 0;
     if (resultPending) *resultPending = resultQueue ? uxQueueMessagesWaiting(resultQueue) : 0;
@@ -1054,19 +1054,19 @@ void EspNowManager::getQueueStats(int* rxPending, int* txPending, int* resultPen
 // HILFSFUNKTIONEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-void EspNowManager::getOwnMac(uint8_t* mac) {
+void ESPNowManager::getOwnMac(uint8_t* mac) {
     if (mac) {
         WiFi.macAddress(mac);
     }
 }
 
-String EspNowManager::getOwnMacString() {
+String ESPNowManager::getOwnMacString() {
     uint8_t mac[6];
     getOwnMac(mac);
     return macToString(mac);
 }
 
-String EspNowManager::macToString(const uint8_t* mac) {
+String ESPNowManager::macToString(const uint8_t* mac) {
     if (!mac) return "NULL";
     
     char buffer[18];
@@ -1075,7 +1075,7 @@ String EspNowManager::macToString(const uint8_t* mac) {
     return String(buffer);
 }
 
-bool EspNowManager::stringToMac(const char* macStr, uint8_t* mac) {
+bool ESPNowManager::stringToMac(const char* macStr, uint8_t* mac) {
     if (!macStr || !mac) return false;
 
     int values[6];
@@ -1092,7 +1092,7 @@ bool EspNowManager::stringToMac(const char* macStr, uint8_t* mac) {
     return true;
 }
 
-int EspNowManager::findPeerIndex(const uint8_t* mac) {
+int ESPNowManager::findPeerIndex(const uint8_t* mac) {
     if (!mac) return -1;
 
     for (int i = 0; i < peers.size(); i++) {
@@ -1103,12 +1103,12 @@ int EspNowManager::findPeerIndex(const uint8_t* mac) {
     return -1;
 }
 
-bool EspNowManager::compareMac(const uint8_t* mac1, const uint8_t* mac2) {
+bool ESPNowManager::compareMac(const uint8_t* mac1, const uint8_t* mac2) {
     if (!mac1 || !mac2) return false;
     return memcmp(mac1, mac2, 6) == 0;
 }
 
-void EspNowManager::printInfo() {
+void ESPNowManager::printInfo() {
     DEBUG_PRINTLN("\n╔═══════════════════════════════════════════════╗");
     DEBUG_PRINTLN("║          ESP-NOW MANAGER INFO                 ║");
     DEBUG_PRINTLN("╚═══════════════════════════════════════════════╝");
