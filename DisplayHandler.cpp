@@ -89,7 +89,6 @@ void DisplayHandler::clear(uint16_t color) {
 void DisplayHandler::setBacklight(uint8_t brightness) {
     currentBrightness = constrain(brightness, BACKLIGHT_MIN, BACKLIGHT_MAX);
     ledcWrite(TFT_BL, currentBrightness);
-    DEBUG_PRINTF("DisplayHandler: Backlight-Helligkeit: %d\n", currentBrightness);
 }
 
 void DisplayHandler::setBacklightOn(bool on) {

@@ -61,7 +61,7 @@ struct UserConfigData {
     int16_t joyCalYMax;
     
     // Auto shutdown
-    bool autoShutDownEnabled;
+    bool autoShutdownEnabled;
 
     // Debug
     bool debugSerialEnabled;
@@ -174,7 +174,7 @@ public:
     int16_t getJoyCalYMax() const { return config.joyCalYMax; }
     
     // Auto shutdown
-    bool getAutoShutdown() const {return config.autoShutDownEnabled;}
+    bool getAutoShutdown() const {return config.autoShutdownEnabled;}
 
     // Debug
     bool getDebugSerialEnabled() const { return config.debugSerialEnabled; }

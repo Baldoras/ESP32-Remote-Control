@@ -45,7 +45,7 @@ void SettingsPage::build() {
     });
     addContentElement(chkAutoShutdown);
 
-    UILabel* lblInfo = new UILabel(layout.contentX + 20, layout.contentY + 110, layout.contentWidth - 40, 60, "Config via SD-Card config.json");
+    UILabel* lblInfo = new UILabel(layout.contentX + 20, layout.contentY + 120, layout.contentWidth - 40, 60, "Config via SD-Card config.json");
     lblInfo->setFontSize(1);
     lblInfo->setAlignment(TextAlignment::CENTER);
     lblInfo->setTransparent(true);
