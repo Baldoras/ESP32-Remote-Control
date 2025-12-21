@@ -50,13 +50,13 @@ void RemoteControlPage::build() {
     labelJoystickX = new UILabel(joystickAreaX + (joystickAreaSize / 2), joyValuesY, joystickAreaSize / 2 - 5, 20, "X: 0");
     labelJoystickX->setAlignment(TextAlignment::LEFT);
     labelJoystickX->setFontSize(1);
-    labelJoystickX->setTransparent(true);
+    labelJoystickX->setTransparent(false);
     addContentElement(labelJoystickX);
     
     labelJoystickY = new UILabel(joystickAreaX, joyValuesY, joystickAreaSize / 2 - 5, 25, "Y: 0");
     labelJoystickY->setAlignment(TextAlignment::LEFT);
     labelJoystickY->setFontSize(1);
-    labelJoystickY->setTransparent(true);
+    labelJoystickY->setTransparent(false);
     addContentElement(labelJoystickY);
     
     // Battery-Anzeige
