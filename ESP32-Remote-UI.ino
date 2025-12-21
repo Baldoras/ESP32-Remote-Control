@@ -383,11 +383,9 @@ void loop() {
     // Connection-Stats loggen (alle 5 Minuten)
     if (lastLoopStart - lastConnectionLog > 300000) {
         if (espNow.isConnected()) {
-            int rxPending, txPending, resultPending;
-            espNow.getQueueStats(&rxPending, &txPending, &resultPending);
-            
+            int rxPending = espNow.getQueuePending();
             String mac = espNow.getOwnMacString();
-            logger.logConnectionStats(mac.c_str(), 0, 0, 0, -65);
+            logger.logConnectionStats(mac.c_str(), 0, 0, rxPending, -65);
         }
         lastConnectionLog = lastLoopStart;
     }
