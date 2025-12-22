@@ -73,9 +73,9 @@ bool JoystickHandler::update() {
     int16_t newRawX = readRaw(pinX);
     int16_t newRawY = readRaw(pinY);
     
-    // Werte mappen
-    int16_t newValueX = mapValue(newRawX, calX, invertX);
-    int16_t newValueY = mapValue(newRawY, calY, invertY);
+    // Werte kreisförmig mappen
+    int16_t newValueX, newValueY;
+    mapValueCircular(newRawX, newRawY, &newValueX, &newValueY);
     
     // Deadzone anwenden
     newValueX = applyDeadzone(newValueX);
@@ -222,4 +222,34 @@ int16_t JoystickHandler::applyDeadzone(int16_t value) {
     }
     
     return value;
+}
+void JoystickHandler::mapValueCircular(int16_t rawX, int16_t rawY, int16_t* outX, int16_t* outY) {
+    // Schritt 1: Beide Achsen linear auf -100 bis +100 mappen
+    int16_t mappedX = mapValue(rawX, calX, invertX);
+    int16_t mappedY = mapValue(rawY, calY, invertY);
+    
+    // Schritt 2: Kreisförmige Normalisierung basierend auf Maximalwert
+    float maxValue = max(abs(mappedX), abs(mappedY));
+    
+    if (maxValue > 0.01f) {
+        // Berechne tatsächliche euklidische Distanz
+        float actualDistance = sqrt(mappedX * mappedX + mappedY * mappedY);
+        
+        if (actualDistance > 0.01f) {
+            // Skaliere so dass der Punkt auf einem Kreis mit Radius = maxValue liegt
+            float scale = maxValue / actualDistance;
+            *outX = (int16_t)(mappedX * scale);
+            *outY = (int16_t)(mappedY * scale);
+        } else {
+            *outX = mappedX;
+            *outY = mappedY;
+        }
+    } else {
+        *outX = mappedX;
+        *outY = mappedY;
+    }
+    
+    // Sicherstellen dass Werte im gültigen Bereich bleiben
+    *outX = constrain(*outX, -100, 100);
+    *outY = constrain(*outY, -100, 100);
 }

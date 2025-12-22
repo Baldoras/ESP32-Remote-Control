@@ -147,6 +147,12 @@ private:
      * ADC-Wert auf -100 bis +100 mappen
      */
     int16_t mapValue(int16_t raw, const AxisCalibration& cal, bool invert);
+    /**
+     * Beide Achsen kreisförmig auf -100 bis +100 mappen
+     * Normalisiert basierend auf Maximalwert der Achsen
+     */
+    void mapValueCircular(int16_t rawX, int16_t rawY, int16_t* outX, int16_t* outY);
+
 
     /**
      * Deadzone anwenden
