@@ -1,5 +1,5 @@
 /**
- * ESP32-Remote-UI.ino
+ * ESP32-Remote-Control.ino
  * 
  * Fernsteuerung mit ESP-NOW und Multi-Page UI + SD-Card Logging + Config-System
  * + Serial Command Interface für Log-Zugriff
