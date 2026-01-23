@@ -301,9 +301,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.touchMinX,
             .defaultPtr = &defaults.touchMinX,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -312,9 +312,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.touchMaxX,
             .defaultPtr = &defaults.touchMaxX,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -323,9 +323,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.touchMinY,
             .defaultPtr = &defaults.touchMinY,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -334,9 +334,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.touchMaxY,
             .defaultPtr = &defaults.touchMaxY,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -393,7 +393,7 @@ ConfigScheme UserConfig::buildScheme() {
             .defaultPtr = &defaults.espnowHeartbeat,
             .hasRange = true,
             .minValue = 100,
-            .maxValue = 10000,
+            .maxValue = 1000,
             .maxLength = 0
         },
         {
@@ -439,7 +439,7 @@ ConfigScheme UserConfig::buildScheme() {
             .defaultPtr = &defaults.joyUpdateInterval,
             .hasRange = true,
             .minValue = 10,
-            .maxValue = 1000,
+            .maxValue = 500,
             .maxLength = 0
         },
         {
@@ -448,9 +448,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::BOOL,
             .valuePtr = &config.joyInvertX,
             .defaultPtr = &defaults.joyInvertX,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 1,
             .maxLength = 0
         },
         {
@@ -459,9 +459,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::BOOL,
             .valuePtr = &config.joyInvertY,
             .defaultPtr = &defaults.joyInvertY,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 1,
             .maxLength = 0
         },
         
@@ -472,9 +472,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalXMin,
             .defaultPtr = &defaults.joyCalXMin,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -483,9 +483,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalXCenter,
             .defaultPtr = &defaults.joyCalXCenter,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -494,9 +494,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalXMax,
             .defaultPtr = &defaults.joyCalXMax,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -505,9 +505,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalYMin,
             .defaultPtr = &defaults.joyCalYMin,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -516,9 +516,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalYCenter,
             .defaultPtr = &defaults.joyCalYCenter,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         {
@@ -527,9 +527,9 @@ ConfigScheme UserConfig::buildScheme() {
             .type = ConfigType::INT16,
             .valuePtr = &config.joyCalYMax,
             .defaultPtr = &defaults.joyCalYMax,
-            .hasRange = false,
+            .hasRange = true,
             .minValue = 0,
-            .maxValue = 0,
+            .maxValue = 4095,
             .maxLength = 0
         },
         
