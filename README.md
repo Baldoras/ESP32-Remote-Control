@@ -1,6 +1,11 @@
 # ESP32-S3 Remote Control with Multi-Page UI
 
-**Professionelle Fernsteuerung für Kettenfahrzeuge mit ESP-NOW, Touch-Display und SD-Logging**
+**Dieses Projekt ist in Bearbeitung (WIP)**
+
+**Das Projekt läuft mit ESP32 core 3.3.3+, das nach derzeitigem stand nur von der Arduino-IDE unterstützt wird!**
+
+
+**Professionelle Fernsteuerung für Kettenfahrwerke mit ESP-NOW, Touch-Display und SD-Logging**
 
 ---
 
@@ -10,8 +15,8 @@ Vollständig ausgestattete, batteriegetriebene Fernsteuerung für Kettenfahrzeug
 
 ### Hauptmerkmale
 
-- **Multi-Page Touch-UI** mit zentralem Header/Footer-System
-- **ESP-NOW Kommunikation** mit TLV-Protokoll und kontinuierlicher Datenübertragung
+- **Multi-Page Touch-UI** mit zentralem UILayout (Header/Footer-System)
+- **ESP-NOW Kommunikation** mit TLV-Protokoll
 - **2S LiPo Batterie-Monitoring** mit Auto-Shutdown-Schutz
 - **Analoger 2-Achsen Joystick** mit Deadzone & Center-Kalibrierung
 - **SD-Karte Logging** (Boot, Battery, Connection, Errors)
@@ -71,60 +76,97 @@ VOLTAGE_SENSE = GPIO4  (ADC, 0-25V Modul)
 ### Modulares Design
 
 ```
-ESP32-Remote-Control.ino
-├── Core System
-│   ├── DisplayHandler           // TFT + Backlight + UIManager
-│   ├── TouchManager             // XPT2046 mit IRQ & Kalibrierung
-│   ├── BatteryMonitor           // Spannungsmessung + Auto-Shutdown
-│   ├── JoystickHandler          // 2-Achsen ADC mit Deadzone
-│   ├── SDCardHandler            // SD-Karte Mount + Operations
-│   ├── LogHandler               // JSON-Logging mit Kategorien
-│   ├── PowerManager             // Deep-Sleep + Wake-up
-│   └── SerialCommandHandler     // USB Debug-Interface
-├── Communication
-│   ├── ESPNowManager            // Basis ESP-NOW Framework
-│   ├── ESPNowRemoteController   // Remote-spezifische Implementierung
-│   └── ESPNowPacket             // TLV-Protokoll Handler
-├── Configuration
-│   ├── ConfigManager            // JSON Config laden/speichern
-│   ├── UserConfig               // Runtime Config-Management
-│   ├── setupConf.h              // Hardware-Konstanten
-│   └── userConf.h               // User-Defaults
-├── UI System
-│   ├── UIManager                // Widget-Management
-│   ├── PageManager              // Multi-Page Navigation
-│   ├── GlobalUI (Globals.cpp)   // Zentrales Header/Footer
-│   └── Widgets: Button, Label, Slider, ProgressBar, CheckBox, etc.
-└── Pages
-    ├── HomePage                 // Startseite mit Navigation
-    ├── RemoteControlPage        // Joystick-Steuerung
-    ├── ConnectionPage           // ESP-NOW Pairing
-    ├── SettingsPage             // System-Einstellungen
-    └── InfoPage                 // System-Informationen
+ESP32-Remote-Control/
+├── ESP32-Remote-Control.ino      # Hauptprogramm
+├── include/                       # Alle Header-Dateien
+│   ├── setupConf.h               # Hardware-Konstanten (NICHT ÄNDERN!)
+│   ├── userConf.h                # User-Defaults (überschreibbar)
+│   ├── Globals.h                 # Globale Objekt-Definitionen
+│   ├── Core System Headers
+│   │   ├── DisplayHandler.h
+│   │   ├── TouchManager.h
+│   │   ├── BatteryMonitor.h
+│   │   ├── JoystickHandler.h
+│   │   ├── SDCardHandler.h
+│   │   ├── LogHandler.h
+│   │   ├── PowerManager.h
+│   │   └── SerialCommandHandler.h
+│   ├── Communication Headers
+│   │   ├── ESPNowManager.h
+│   │   ├── ESPNowRemoteController.h
+│   │   └── ESPNowPacket.h
+│   ├── Configuration Headers
+│   │   ├── ConfigManager.h
+│   │   └── UserConfig.h
+│   ├── UI System Headers
+│   │   ├── UIManager.h
+│   │   ├── PageManager.h
+│   │   ├── UILayout.h
+│   │   ├── UIPage.h
+│   │   ├── UIElement.h
+│   │   └── UI-Widgets (UIButton.h, UILabel.h, etc.)
+│   └── Pages Headers
+│       ├── HomePage.h
+│       ├── RemoteControlPage.h
+│       ├── ConnectionPage.h
+│       ├── SettingsPage.h
+│       └── InfoPage.h
+└── *.cpp                         # ALLE .cpp im Root (Arduino-IDE!)
+    ├── DisplayHandler.cpp
+    ├── TouchManager.cpp
+    ├── BatteryMonitor.cpp
+    ├── JoystickHandler.cpp
+    ├── ... (alle Implementation-Dateien)
 ```
+
+**Wichtig für Arduino-IDE:** 
+- Alle `.h` Dateien in `/include/`
+- Alle `.cpp` Dateien im **Root-Verzeichnis** (Arduino-IDE erlaubt keine Unterordner für .cpp)
 
 ### Konfigurationssystem
 
-- **setupConf.h**: Hardware-Konstanten (GPIO-Pins, Display-Settings) - NICHT ÄNDERN
-- **userConf.h**: User-Defaults (Backlight, Touch-Kalibrierung, ESP-NOW)
+- **setupConf.h**: Hardware-Konstanten (GPIO-Pins, Display-Settings, SPI-Frequenzen) - **NICHT ÄNDERN**
+- **userConf.h**: User-Defaults (Backlight, Touch-Kalibrierung, ESP-NOW, Joystick)
 - **config.json**: Runtime-Config auf SD-Karte (überschreibt userConf.h)
-- **UserConfig-Klasse**: Runtime Config-Management mit Schema-Validierung
+- **UserConfig-Klasse**: Runtime Config-Management mit Validierung
+
+### UI-Architektur
+
+```
+PageManager
+├── UILayout (einmalig erstellt)
+│   ├── Header (0-40px)    → Zurück-Button, Titel, Battery-Icon
+│   ├── Content (40-280px) → Dynamischer Bereich für Pages
+│   └── Footer (280-320px) → Status-Text
+├── UIManager (Widget-Verwaltung)
+└── Pages (nur Content-Bereich)
+    ├── HomePage
+    ├── RemoteControlPage
+    ├── ConnectionPage
+    ├── SettingsPage
+    └── InfoPage
+```
+
+**Wichtig:** 
+- Header/Footer werden EINMAL vom UILayout erstellt
+- Pages verwalten NUR den Content-Bereich (40-300px)
+- PageManager besitzt UILayout und koordiniert alles
 
 ### Multi-Threading (FreeRTOS)
 
 ```
 Core 0: WiFi/ESP-NOW
-└── ESP-NOW Hardware-Callbacks
+└── ESP-NOW Hardware-Callbacks (RX/TX)
 
 Core 1: Main Loop
-├── Display & UI Updates (primär)
+├── Display & UI Updates
 ├── Touch Event Handling
-├── Joystick-Auslesen (kontinuierlich, 20ms)
+├── Joystick-Auslesen (kontinuierlich, 100ms)
 ├── Battery Monitoring (1s Intervall)
 └── ESP-NOW Queue Processing
 ```
 
-**Wichtig:** Worker-Task entfernt - ESP-NOW nutzt Hardware-Callbacks für optimale Performance.
+**Wichtig:** Kein separater Worker-Task - ESP-NOW nutzt Hardware-Callbacks direkt.
 
 ---
 
@@ -138,34 +180,34 @@ Core 1: Main Loop
 
 **Beispiel - Joystick-Daten senden:**
 ```cpp
-EspNowPacket packet;
+RemoteESPNowPacket packet;
 packet.begin(MainCmd::DATA_REQUEST)
-      .addInt16(DataCmd::JOYSTICK_X, joyX)
-      .addInt16(DataCmd::JOYSTICK_Y, joyY)
-      .addByte(DataCmd::JOYSTICK_BTN, btnState);
+      .addJoystick(joyX, joyY, btnPressed);
 
-espnow.send(peerMac, packet);
+espNow.send(peerMac, packet);
 ```
 
 ### Kontinuierliche Übertragung
 
-**Kritisch:** Joystick-Daten werden kontinuierlich gesendet, nicht nur bei Änderungen. Dies verhindert, dass das Fahrzeug mit alten Kommandos weiterfährt, wenn der Joystick in Neutralstellung zurückkehrt.
+Joystick-Daten werden **kontinuierlich** gesendet (alle 100ms), nicht nur bei Änderungen. Dies verhindert, dass das Fahrzeug mit alten Kommandos weiterfährt, wenn der Joystick zurück in Neutralstellung geht.
 
 ### Vordefinierte Commands
 
 | MainCmd | Beschreibung |
 |---------|--------------|
-| `HEARTBEAT` | Keep-Alive alle 500ms |
+| `HEARTBEAT` | Keep-Alive (alle 500ms) |
 | `DATA_REQUEST` | Joystick/Sensor-Daten |
 | `DATA_RESPONSE` | Telemetrie vom Fahrzeug |
 
 | DataCmd | Typ | Beschreibung |
 |---------|-----|--------------|
 | `JOYSTICK_X/Y` | int16_t | -100 bis +100 |
+| `JOYSTICK_BTN` | uint8_t | 0/1 |
+| `JOYSTICK_ALL` | struct | X, Y, Button |
 | `MOTOR_LEFT/RIGHT` | int16_t | -100 bis +100 |
+| `MOTOR_ALL` | struct | Left, Right |
 | `BATTERY_VOLTAGE` | uint16_t | mV |
 | `BATTERY_PERCENT` | uint8_t | 0-100% |
-| `BUTTON_STATE` | uint8_t | Bitmask |
 
 ---
 
@@ -173,33 +215,37 @@ espnow.send(peerMac, packet);
 
 ### Logging (Linux-style Format)
 
+Alle Logs im Verzeichnis `/logs/`:
+
 ```
-// boot.log
+// /logs/boot.log
 [2024-12-21 14:32:01] [INFO] [BOOT] Boot started: reason=PowerOn
 [2024-12-21 14:32:02] [INFO] [BOOT] Init Display: OK
 
-// battery.log
+// /logs/battery.log
 [2024-12-21 14:33:00] [INFO] [BATTERY] voltage=7.85V, percent=78%
 
-// connection.log
+// /logs/connection.log
 [2024-12-21 14:32:05] [INFO] [ESPNOW] Peer connected: AA:BB:CC:DD:EE:FF
 
-// error.log
+// /logs/error.log
 [2024-12-21 14:35:00] [ERROR] [Touch] XPT2046 timeout (code=2)
 ```
 
 ### Konfiguration (config.json)
 
+Speicherort: Root der SD-Karte
+
 ```json
 {
   "backlight_default": 128,
-  "touch_min_x": 100,
-  "touch_max_x": 4000,
-  "touch_min_y": 100,
-  "touch_max_y": 4000,
-  "touch_threshold": 600,
+  "touch_min_x": 300,
+  "touch_max_x": 3800,
+  "touch_min_y": 300,
+  "touch_max_y": 3800,
+  "touch_threshold": 40,
   "espnow_heartbeat": 500,
-  "espnow_timeout": 2000,
+  "espnow_timeout": 30000,
   "autoshutdown": true,
   "debug_serial": true
 }
@@ -234,7 +280,7 @@ espnow.send(peerMac, packet);
 ### 5. InfoPage
 - **System-Info**: Hardware, Display, Battery, SD-Karte
 - **ESP-NOW**: Status, Connected
-- **Joystick**: X/Y (raw + mapped), Neutral-Status
+- **Joystick**: X/Y (raw + mapped), Neutral
 - **System**: Free Heap, Uptime
 - **Refresh-Button**
 
@@ -269,7 +315,7 @@ if (currentVoltage <= VOLTAGE_SHUTDOWN) {  // 6.6V = 3.3V/Zelle
 # ESP32 Board Package URL:
 https://espressif.github.io/arduino-esp32/package_esp32_index.json
 
-# Board Manager: "esp32" by Espressif (v3.0.0+)
+# Board Manager: "esp32" by Espressif (v3.3.3+)
 
 # Libraries (via Library Manager):
 - TFT_eSPI (v2.5.43+)
@@ -280,16 +326,19 @@ https://espressif.github.io/arduino-esp32/package_esp32_index.json
 ### 2. Board-Einstellungen
 
 ```
-Board: "ESP32S3 Dev Module"
+Board: "4D Systems gen4-ESP32 Modules"
 Flash Size: 16MB (128Mb)
 PSRAM: "OPI PSRAM"
 Partition Scheme: "16M Flash (3MB APP/9.9MB FATFS)"
 Upload Speed: 921600
+Core Debug Level: "None" (oder "Info" für Debugging)
 ```
 
 ### 3. Hardware Verkabelung
 
 #### Backlight-Schaltung (NPN+PNP)
+
+**Wichtig:** NPN+PNP Kombination für **normale Logik** (HIGH = AN)
 
 ```
 GPIO16 → 1kΩ → NPN-Basis (2N2222A)
@@ -297,9 +346,32 @@ NPN-Emitter → GND
 NPN-Kollektor → PNP-Emitter (2N3906)
 PNP-Basis → 10kΩ → +3.3V
 PNP-Kollektor → TFT_BL+ (Display Backlight)
+TFT_BL- → GND
+10kΩ Pull-Up (PNP-Basis → 3.3V)
+220Ω Strombegrenzung (optional, PNP-Kollektor)
 ```
 
-**Funktionsweise:** GPIO16 HIGH → Backlight AN (normale Logik)
+**Funktionsweise:**
+- GPIO16 HIGH → NPN leitet → PNP-Basis LOW → **Backlight AN**
+- GPIO16 LOW → NPN sperrt → PNP-Basis HIGH → **Backlight AUS**
+- PWM auf GPIO16 → Helligkeitssteuerung (0-255)
+
+**Siehe Schaltplan im Repo:** [esp32_backlight_npn_pnp1.jpg](esp32_backlight_npn_pnp1.jpg)
+
+### 4. Code hochladen
+
+```bash
+Sketch → Upload
+```
+
+### 5. SD-Karte vorbereiten
+
+```bash
+# 1. FAT32 formatieren (max. 32GB)
+# 2. Optional: config.json im Root erstellen
+# 3. In SD-Slot einlegen
+# 4. Beim ersten Boot werden /logs/ automatisch erstellt
+```
 
 ---
 
@@ -326,18 +398,34 @@ Setup complete! (1234 ms)
 
 **Verfügbare Befehle:**
 ```bash
+# Log-Management
 logs                    # Log-Dateien auflisten
 read <file>            # Log-Datei lesen
 tail <file> <n>        # Letzte N Zeilen
-sysinfo                # System-Informationen
+head <file> <n>        # Erste N Zeilen
+clear <file>           # Log-Datei löschen
+clearall               # ALLE Logs löschen
+
+# System-Informationen
+sysinfo                # Hardware/System-Info
 battery                # Battery-Status
+espnow                 # ESP-NOW Status
+
+# Konfiguration
+config                 # Komplette Config anzeigen
+config list            # Alle Config-Keys
 config get <key>       # Config-Wert abrufen
 config set <key> <val> # Config-Wert setzen
+config save            # Config auf SD speichern
+config reset           # Standard-Config laden
+
+# Hilfe
+help                   # Alle Befehle anzeigen
 ```
 
 **Beispiel:**
 ```
-> tail boot.log 5
+> tail /logs/boot.log 5
 [2024-12-21 14:32:05] [INFO] [BOOT] Init ESP-NOW: OK
 [2024-12-21 14:32:05] [INFO] [BOOT] Boot complete: 2345ms
 
@@ -360,8 +448,8 @@ PSRAM:  8MB  (UI-Widgets, Buffers)
 SRAM:   512KB (Stack, Heap)
 
 Optimierungen:
-- GlobalUI: 1x Header/Footer (zentral, nicht pro Page)
-- UI-Widgets: Managed via UIManager
+- UILayout: 1x Header/Footer (zentral via PageManager)
+- Pages: Nur Content-Bereich (40-280px)
 - ESP-NOW: Hardware-Callbacks (keine Worker-Threads)
 - JSON: ArduinoJson V7
 ```
@@ -384,9 +472,10 @@ Laufzeit: ~16-17 Stunden (gemessen)
 ```cpp
 Raw ADC:    0 ───── 2048 ───── 4095
 Mapped:   -100 ───── 0 ───── +100
-Deadzone:       [-10 ... +10] → 0
+Deadzone:       [-5 ... +5] → 0 (5% default)
 
 // Verhindert Drift durch ADC-Rauschen
+// Einstellbar in userConf.h: JOY_DEADZONE_PERCENT
 ```
 
 ---
@@ -407,12 +496,14 @@ Deadzone:       [-10 ... +10] → 0
 
 | Problem | Lösung |
 |---------|--------|
-| **Display schwarz** | Backlight-Schaltung prüfen, GPIO16 |
-| **Touch reagiert nicht** | TOUCH_CS = GPIO5? Kalibrierung |
-| **Joystick driftet** | Center-Kalibrierung, Deadzone |
-| **ESP-NOW disconnected** | MAC korrekt? Kanal 0? |
-| **SD-Karte Error** | FAT32? CS-Pin? |
+| **Display schwarz** | Backlight-Schaltung prüfen (NPN+PNP), GPIO16 |
+| **Touch reagiert nicht** | TOUCH_CS = GPIO5? Kalibrierung in config.json |
+| **Joystick driftet** | Center-Kalibrierung, Deadzone erhöhen |
+| **ESP-NOW disconnected** | MAC korrekt? Kanal in userConf.h (Standard: 2) |
+| **SD-Karte Error** | FAT32? CS-Pin (GPIO38)? |
 | **Auto-Shutdown** | LiPo laden! (< 6.6V) |
+| **UI crasht** | PSRAM aktiviert? Heap-Speicher prüfen |
+| **Kompilier-Fehler** | ESP32 Core 3.0.0 - 3.3.3+ installiert? |
 
 ---
 
@@ -421,17 +512,65 @@ Deadzone:       [-10 ... +10] → 0
 ### Joystick-Empfindlichkeit
 
 ```cpp
-joystick.setUpdateInterval(20);  // 20ms = 50Hz (Standard)
-joystick.setUpdateInterval(50);  // 50ms = 20Hz (langsamer)
+// userConf.h
+#define JOY_UPDATE_INTERVAL  20    // 20ms = 50Hz (Standard)
+#define JOY_DEADZONE_PERCENT 5     // 5% Deadzone (Standard)
 ```
 
 ### ESP-NOW Heartbeat
 
 ```cpp
-// userConf.h oder config.json
-#define ESPNOW_HEARTBEAT_INTERVAL 500  // ms
-#define ESPNOW_TIMEOUT_MS 2000         // ms
+// userConf.h
+#define ESPNOW_HEARTBEAT_INTERVAL 500   // ms
+#define ESPNOW_TIMEOUT            30000 // ms (30s)
+#define ESPNOW_CHANNEL            2     // WiFi-Kanal
 ```
+
+### Display-Helligkeit
+
+```cpp
+// userConf.h
+#define BACKLIGHT_DEFAULT 20  // 0-255 (20 = niedrig für Stromsparen)
+```
+
+---
+
+## 📂 Projektstruktur (Arduino-IDE kompatibel)
+
+```
+ESP32-Remote-Control/
+├── ESP32-Remote-Control.ino      # Hauptprogramm
+├── include/                       # Alle Header-Dateien
+│   ├── setupConf.h
+│   ├── userConf.h
+│   ├── Globals.h
+│   └── [alle anderen .h Dateien]
+├── BatteryMonitor.cpp            # ⚠️ ALLE .cpp im Root!
+├── ConfigManager.cpp
+├── ConnectionPage.cpp
+├── DisplayHandler.cpp
+├── ESPNowManager.cpp
+├── ESPNowPacket.cpp
+├── ESPNowRemoteController.cpp
+├── Globals.cpp
+├── HomePage.cpp
+├── InfoPage.cpp
+├── JoystickHandler.cpp
+├── LogHandler.cpp
+├── PageManager.cpp
+├── PowerManager.cpp
+├── RemoteControlPage.cpp
+├── SDCardHandler.cpp
+├── SerialCommandHandler.cpp
+├── SettingsPage.cpp
+├── TouchManager.cpp
+├── UI*.cpp                       # Alle UI-Widget .cpp
+├── UserConfig.cpp
+├── README.md
+└── LICENSE
+```
+
+**Wichtig:** Arduino-IDE erlaubt keine Unterordner für `.cpp` Dateien!
 
 ---
 
