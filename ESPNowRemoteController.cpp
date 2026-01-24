@@ -382,7 +382,7 @@ void ESPNowRemoteController::processRxQueue() {
         
         // Peer aktualisieren (mit Mutex)
         bool wasDisconnected = false;
-        if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+        if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
             int index = findPeerIndex(rxItem.mac);
             if (index >= 0) {
                 wasDisconnected = !peers[index].connected;
@@ -411,7 +411,7 @@ void ESPNowRemoteController::processRxQueue() {
             DEBUG_PRINTLN("  → PAIR_RESPONSE empfangen - Pairing erfolgreich!");
             
             // Peer-Verbindung auf connected setzen (mit Mutex)
-            if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+            if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
                 int index = findPeerIndex(rxItem.mac);
                 if (index >= 0) {
                     peers[index].connected = true;
@@ -433,7 +433,7 @@ void ESPNowRemoteController::processRxQueue() {
             DEBUG_PRINTLN("  → ACK empfangen (Heartbeat-Bestätigung)");
             
             // lastSeen aktualisieren um Timeout zu verlängern (mit Mutex)
-            if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+            if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
                 int index = findPeerIndex(rxItem.mac);
                 if (index >= 0) {
                     peers[index].lastSeen = rxItem.timestamp;

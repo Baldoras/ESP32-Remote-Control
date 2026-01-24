@@ -323,7 +323,7 @@ bool ESPNowManager::send(const uint8_t* mac, const ESPNowPacket& packet) {
     }
 
     // Statistik aktualisieren (mit Mutex)
-    if (mac && xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+    if (mac && xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
         int index = findPeerIndex(mac);
         if (index >= 0) {
             peers[index].packetsSent++;
@@ -546,7 +546,7 @@ void ESPNowManager::onDataSentStatic(const wifi_tx_info_t* tx_info, esp_now_send
 
 void ESPNowManager::handleSendStatus(const uint8_t* mac, bool success) {
     // Statistik aktualisieren (mit Mutex)
-    if (mac && !success && xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+    if (mac && !success && xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
         int index = findPeerIndex(mac);
         if (index >= 0) {
             peers[index].packetsLost++;
@@ -651,7 +651,7 @@ void ESPNowManager::processRxQueue() {
         
         // Peer aktualisieren (mit Mutex)
         bool wasDisconnected = false;
-        if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+        if (xSemaphoreTake(peersMutex, pdMS_TO_TICKS(1)) == pdTRUE) {
             int index = findPeerIndex(rxItem.mac);
             if (index >= 0) {
                 wasDisconnected = !peers[index].connected;
