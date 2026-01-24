@@ -357,7 +357,13 @@ void loop() {
     int16_t joyY = joystick.getY();
     bool joyBtn = false; //joystick.isPressed();
     
-    if (joystick.isNeutral()) {
+     // Status-Tracking für Idle-Reduktion
+    static bool lastWasNeutral = false;
+    static bool neutralSent = false;
+    
+    bool isNeutral = joystick.isNeutral();
+
+    if (isNeutral) {
         joyX = 0;
         joyY = 0;
     }
@@ -366,14 +372,31 @@ void loop() {
     pageManager->updateJoystick(joyX, joyY);
     
     // Via ESP-NOW senden (High-Level API)
-    if (espNow.isConnected() && lastLoopStart - lastJoystickSend > 100) {
-        uint8_t peerMac[6];
-        if (ESPNowRemoteController::stringToMac(userConfig.getEspnowPeerMac(), peerMac)) {
-            espNow.sendJoystick(peerMac, joyX, joyY, joyBtn);
-            lastJoystickSend = lastLoopStart;
+    if (espNow.isConnected() && lastLoopStart - lastJoystickSend >= 100) {
+        bool shouldSend = false;
+        
+        if (isNeutral) {
+            // Neutral-Position: Nur einmal senden
+            if (!neutralSent) {
+                shouldSend = true;
+                neutralSent = true;
+            }
+            // Sonst: Pausieren (keine Datenübertragung im Idle)
+        } else {
+            // Außerhalb Deadzone: Kontinuierlich senden
+            shouldSend = true;
+            neutralSent = false;  // Reset für nächsten Neutral-Zustand
+        }
+        if (shouldSend) {
+            uint8_t peerMac[6];
+            if (ESPNowRemoteController::stringToMac(userConfig.getEspnowPeerMac(), peerMac)) {
+                espNow.sendJoystick(peerMac, joyX, joyY, joyBtn);
+                lastJoystickSend = lastLoopStart;
+            }
         }
     }
     
+    lastWasNeutral = isNeutral;
 
     // ═══════════════════════════════════════════════════════════════
     // ESP-NOW
